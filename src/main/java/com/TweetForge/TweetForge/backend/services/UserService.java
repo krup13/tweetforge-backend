@@ -1,6 +1,7 @@
 package com.TweetForge.TweetForge.backend.services;
 
 import com.TweetForge.TweetForge.backend.exceptions.EmailAlreadyTakenException;
+import com.TweetForge.TweetForge.backend.exceptions.EmailFailedToSendException;
 import com.TweetForge.TweetForge.backend.exceptions.UserDoesNotExistException;
 import com.TweetForge.TweetForge.backend.models.ApplicationUser;
 import com.TweetForge.TweetForge.backend.models.RegistrationObject;
@@ -19,12 +20,14 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final MailService mailService;
     private final SqlInitializationAutoConfiguration sqlInitializationAutoConfiguration;
 
     @Autowired //auto-inject dependencies into this constructor
-    public UserService(UserRepository userRepository, RoleRepository roleRepository, SqlInitializationAutoConfiguration sqlInitializationAutoConfiguration) {
+    public UserService(UserRepository userRepository, RoleRepository roleRepository, SqlInitializationAutoConfiguration sqlInitializationAutoConfiguration, MailService mailService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.mailService = mailService;
         this.sqlInitializationAutoConfiguration = sqlInitializationAutoConfiguration;
     }
 
@@ -87,6 +90,12 @@ public class UserService {
 
         user.setVerificationCode(generateVerificationNumber());
 
+        try {
+            mailService.sendEmail(user.getEmail(), "Your verification code", "Here is your verification code : " + user.getVerificationCode());
+            userRepository.save(user);
+        } catch (Exception e) {
+            throw new EmailFailedToSendException();
+        }
         userRepository.save(user);
     }
 
@@ -95,7 +104,7 @@ public class UserService {
         return name+generatedNumber;
     }
 
-    private long generateVerificationNumber() {
+    private Long generateVerificationNumber() {
        return (long) Math.floor(Math.random() * 1_000_000_000);
     }
 
