@@ -1,10 +1,12 @@
 package com.TweetForge.TweetForge.backend.controllers;
 
 import com.TweetForge.TweetForge.backend.exceptions.EmailAlreadyTakenException;
+import com.TweetForge.TweetForge.backend.exceptions.EmailFailedToSendException;
 import com.TweetForge.TweetForge.backend.exceptions.UserDoesNotExistException;
 import com.TweetForge.TweetForge.backend.models.ApplicationUser;
 import com.TweetForge.TweetForge.backend.models.RegistrationObject;
 import com.TweetForge.TweetForge.backend.services.UserService;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,6 +56,11 @@ public class AuthenticationController {
 
         return userService.updateUser(user);
 
+    }
+
+    @ExceptionHandler({EmailFailedToSendException.class})
+    public ResponseEntity<String> handleFailedEmail(){
+        return new ResponseEntity<String>("Email failed to send, try again in a moment", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @PostMapping("/email/code")
