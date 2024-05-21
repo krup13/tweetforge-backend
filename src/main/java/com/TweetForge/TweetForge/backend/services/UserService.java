@@ -2,6 +2,7 @@ package com.TweetForge.TweetForge.backend.services;
 
 import com.TweetForge.TweetForge.backend.exceptions.EmailAlreadyTakenException;
 import com.TweetForge.TweetForge.backend.exceptions.EmailFailedToSendException;
+import com.TweetForge.TweetForge.backend.exceptions.IncorrectVerificationCodeException;
 import com.TweetForge.TweetForge.backend.exceptions.UserDoesNotExistException;
 import com.TweetForge.TweetForge.backend.models.ApplicationUser;
 import com.TweetForge.TweetForge.backend.models.RegistrationObject;
@@ -97,6 +98,18 @@ public class UserService {
             throw new EmailFailedToSendException();
         }
         userRepository.save(user);
+    }
+
+    public ApplicationUser verifyEmail (String username, Long code) {
+        ApplicationUser user = userRepository.findByUsername(username).orElseThrow(UserDoesNotExistException::new);
+
+        if(code.equals(user.getVerificationCode())){
+            user.setEnabled(true);
+            user.setVerificationCode(null); //recheck in ep12
+            return userRepository.save(user);
+        } else {
+            throw new IncorrectVerificationCodeException();
+        }
     }
 
     private String generateUsername(String name) {

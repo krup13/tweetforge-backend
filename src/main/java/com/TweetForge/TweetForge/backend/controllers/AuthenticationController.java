@@ -2,19 +2,17 @@ package com.TweetForge.TweetForge.backend.controllers;
 
 import com.TweetForge.TweetForge.backend.exceptions.EmailAlreadyTakenException;
 import com.TweetForge.TweetForge.backend.exceptions.EmailFailedToSendException;
+import com.TweetForge.TweetForge.backend.exceptions.IncorrectVerificationCodeException;
 import com.TweetForge.TweetForge.backend.exceptions.UserDoesNotExistException;
 import com.TweetForge.TweetForge.backend.models.ApplicationUser;
 import com.TweetForge.TweetForge.backend.models.RegistrationObject;
 import com.TweetForge.TweetForge.backend.services.UserService;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedHashMap;
-
-import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @RequestMapping("/auth")
@@ -68,6 +66,20 @@ public class AuthenticationController {
         userService.generateEmailVerification(body.get("username"));
 
         return new ResponseEntity<String>("Verification code generated, email sent", HttpStatus.OK);
+    }
+
+    @ExceptionHandler({IncorrectVerificationCodeException.class})
+    public ResponseEntity<String> incorrectCodeHandler(){
+        return new ResponseEntity<String>("Code provided does not match User code", HttpStatus.CONFLICT);
+    }
+
+    @PostMapping("/email/verify")
+    public ApplicationUser verifyEmail(@RequestBody LinkedHashMap<String, String> body) {
+        Long code = Long.parseLong(body.get("code"));
+
+        String username = body.get("username");
+
+        return userService.verifyEmail(username,code);
     }
 
 
