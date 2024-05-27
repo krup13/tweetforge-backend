@@ -16,6 +16,7 @@ import java.util.LinkedHashMap;
 
 @RestController
 @RequestMapping("/auth")
+@CrossOrigin("+")
 public class AuthenticationController {
 
     private final UserService userService;
@@ -82,5 +83,12 @@ public class AuthenticationController {
         return userService.verifyEmail(username,code);
     }
 
+    @PutMapping("/update/password")
+    public ApplicationUser updatePassword(@RequestBody LinkedHashMap<String, String> body) {
+        String username = body.get("username");
+        String password = body.get("password");
+
+        return userService.setPassword(username, password);
+    }
 
 }
