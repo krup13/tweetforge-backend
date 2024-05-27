@@ -11,6 +11,7 @@ import com.TweetForge.TweetForge.backend.repositories.RoleRepository;
 import com.TweetForge.TweetForge.backend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.sql.init.SqlInitializationAutoConfiguration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -22,14 +23,14 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final MailService mailService;
-    private final SqlInitializationAutoConfiguration sqlInitializationAutoConfiguration;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired //auto-inject dependencies into this constructor
-    public UserService(UserRepository userRepository, RoleRepository roleRepository, SqlInitializationAutoConfiguration sqlInitializationAutoConfiguration, MailService mailService) {
+    public UserService(UserRepository userRepository, RoleRepository roleRepository, MailService mailService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.mailService = mailService;
-        this.sqlInitializationAutoConfiguration = sqlInitializationAutoConfiguration;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public ApplicationUser getUserByUsername(String username) {
@@ -110,6 +111,16 @@ public class UserService {
         } else {
             throw new IncorrectVerificationCodeException();
         }
+    }
+
+    public ApplicationUser setPassword(String username, String password){
+        ApplicationUser user = userRepository.findByUsername(username).orElseThrow(UserDoesNotExistException::new);
+
+        String encodedPassword = passwordEncoder.encode(password);
+
+        user.setPassword(encodedPassword);
+
+        return userRepository.save(user);
     }
 
     private String generateUsername(String name) {
