@@ -1,6 +1,5 @@
 package com.TweetForge.TweetForge.backend;
 
-import com.TweetForge.TweetForge.backend.models.ApplicationUser;
 import com.TweetForge.TweetForge.backend.models.Role;
 import com.TweetForge.TweetForge.backend.repositories.RoleRepository;
 import com.TweetForge.TweetForge.backend.services.UserService;
