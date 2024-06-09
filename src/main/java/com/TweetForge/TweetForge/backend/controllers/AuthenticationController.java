@@ -1,29 +1,47 @@
 package com.TweetForge.TweetForge.backend.controllers;
 
+import com.TweetForge.TweetForge.backend.dto.FindUsernameDTO;
+import com.TweetForge.TweetForge.backend.dto.PasswordCodeDTO;
 import com.TweetForge.TweetForge.backend.exceptions.EmailAlreadyTakenException;
 import com.TweetForge.TweetForge.backend.exceptions.EmailFailedToSendException;
 import com.TweetForge.TweetForge.backend.exceptions.IncorrectVerificationCodeException;
 import com.TweetForge.TweetForge.backend.exceptions.UserDoesNotExistException;
 import com.TweetForge.TweetForge.backend.models.ApplicationUser;
+import com.TweetForge.TweetForge.backend.models.LoginResponse;
 import com.TweetForge.TweetForge.backend.models.RegistrationObject;
+import com.TweetForge.TweetForge.backend.services.MailService;
+import com.TweetForge.TweetForge.backend.services.TokenService;
 import com.TweetForge.TweetForge.backend.services.UserService;
+import org.apache.http.auth.InvalidCredentialsException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedHashMap;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin("+")
+@CrossOrigin("*")
 public class AuthenticationController {
 
     private final UserService userService;
+    private final TokenService tokenService;
+    private final AuthenticationManager authenticationManager;
+    private final MailService emailService;
 
     @Autowired
-    public AuthenticationController(UserService userService) {
+    public AuthenticationController(UserService userService, TokenService tokenService, AuthenticationManager authenticationManager, MailService emailService) {
         this.userService = userService;
+        this.tokenService = tokenService;
+        this.authenticationManager = authenticationManager;
+        this.emailService = emailService;
     }
 
     @ExceptionHandler({EmailAlreadyTakenException.class})
@@ -91,4 +109,49 @@ public class AuthenticationController {
         return userService.setPassword(username, password);
     }
 
+    @PostMapping("/login")
+    public LoginResponse login(@RequestBody LinkedHashMap<String, String> body) throws InvalidCredentialsException{
+
+        String username = body.get("username");
+        String password = body.get("password");
+
+        try{
+            Authentication auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(username, password));
+
+            String token = tokenService.generateToken(auth);
+            return new LoginResponse(userService.getUserByUsername(username), token);
+        }
+        catch(AuthenticationException e){
+            throw new InvalidCredentialsException();
+        }
+    }
+
+    @ExceptionHandler({InvalidCredentialsException.class})
+    public ResponseEntity<String> handleInvalidCredentials(){
+        return new ResponseEntity<String>("Invalid credentials", HttpStatus.FORBIDDEN);
+    }
+
+    @PostMapping("/find")
+    public ResponseEntity<String> verifyUsername(@RequestBody FindUsernameDTO credential){
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.TEXT_PLAIN);
+        String username = userService.verifyUsername(credential);
+        return new ResponseEntity<String>(username, HttpStatus.OK);
+    }
+
+
+    @PostMapping("/identifiers")
+    public FindUsernameDTO findIdentifiers(@RequestBody FindUsernameDTO credential){
+        ApplicationUser user = userService.getUsersEmailAndPhone(credential);
+        return new FindUsernameDTO(user.getEmail(), user.getPhoneNumber(), user.getUsername());
+    }
+
+    @PostMapping("/password/code")
+    public ResponseEntity<String> retrievePasswordCode(@RequestBody PasswordCodeDTO body) throws EmailFailedToSendException{
+        String email = body.getEmail();
+        int code = body.getCode();
+        emailService.sendEmail(email, "Your password reset code ", ""+code);
+        return new ResponseEntity<String>("Code sent succesfully", HttpStatus.OK);
+    }
 }
