@@ -8,10 +8,7 @@ import com.TweetForge.TweetForge.backend.models.RegistrationObject;
 import com.TweetForge.TweetForge.backend.models.Role;
 import com.TweetForge.TweetForge.backend.repositories.RoleRepository;
 import com.TweetForge.TweetForge.backend.repositories.UserRepository;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.wavefront.WavefrontProperties;
-import org.springframework.boot.autoconfigure.sql.init.SqlInitializationAutoConfiguration;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -22,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,114 +31,115 @@ import java.util.stream.Collectors;
 @Service
 public class UserService implements UserDetailsService{
 
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
+    private final UserRepository userRepo;
+    private final RoleRepository roleRepo;
     private final MailService mailService;
     private final PasswordEncoder passwordEncoder;
     private final ImageService imageService;
 
-    @Autowired //auto-inject dependencies into this constructor
-    public UserService(UserRepository userRepository, RoleRepository roleRepository, MailService mailService, PasswordEncoder passwordEncoder, ImageService imageService) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
+    @Autowired
+    public UserService(UserRepository userRepo, RoleRepository roleRepo, MailService mailService, PasswordEncoder passwordEncoder, ImageService imageService) {
+        this.userRepo = userRepo;
+        this.roleRepo = roleRepo;
         this.mailService = mailService;
         this.passwordEncoder = passwordEncoder;
         this.imageService = imageService;
     }
 
-    public ApplicationUser getUserById(Integer userId){
-        return userRepository.findById(userId).orElseThrow(UserDoesNotExistException::new);
+    public ApplicationUser getUserById(Integer userId) {
+        return userRepo.findById(userId).orElseThrow(UserDoesNotExistException::new);
     }
 
     public ApplicationUser getUserByUsername(String username) {
-        return userRepository.findByUsername(username).orElseThrow(UserDoesNotExistException::new);
+        return userRepo.findByUsername(username).orElseThrow(UserDoesNotExistException::new);
     }
 
     public ApplicationUser updateUser(ApplicationUser user) {
-        try{
-            return userRepository.save(user);
-        } catch (Exception e){
+        try {
+            return userRepo.save(user);
+        } catch(Exception e) {
             throw new EmailAlreadyTakenException();
         }
     }
 
-    //if any problems encountered, refer ep. 3
-    public ApplicationUser registerUser(RegistrationObject registrationObject) {
+
+    public ApplicationUser registerUser(RegistrationObject ro) {
+
         ApplicationUser user = new ApplicationUser();
 
-        user.setFirstName(registrationObject.getFirstName());
-        user.setLastName(registrationObject.getLastName());
-        user.setEmail(registrationObject.getEmail());
-        user.setDateOfBirth(registrationObject.getDob());
+        user.setFirstName(ro.getFirstName());
+        user.setLastName(ro.getLastName());
+        user.setEmail(ro.getEmail());
+        user.setDateOfBirth(ro.getDob());
 
         String name = user.getFirstName() + user.getLastName();
 
         boolean nameTaken = true;
 
         String tempName = "";
-        while (nameTaken) {
+
+        while(nameTaken) {
             tempName = generateUsername(name);
 
-            if (userRepository.findByUsername(tempName).isEmpty()){
-                nameTaken=false;
+            if(userRepo.findByUsername(tempName).isEmpty()) {
+                nameTaken = false;
             }
+
         }
 
         user.setUsername(tempName);
 
         Set<Role> roles = user.getAuthorities();
-
-        if (roles == null) {
-            roles = new HashSet<>();
-            roles.add(roleRepository.findByAuthority("USER").get());
-            user.setAuthorities(roles);
-        } else {
-            roles.add(roleRepository.findByAuthority("USER").get());
-            user.setAuthorities(roles);
-        }
+        roles.add(roleRepo.findByAuthority("USER").get());
+        user.setAuthorities(roles);
 
         try {
-            return userRepository.save(user);
+            return userRepo.save(user);
         } catch (Exception e) {
             throw new EmailAlreadyTakenException();
         }
     }
 
     public void generateEmailVerification(String username) {
-        ApplicationUser user = userRepository.findByUsername(username).orElseThrow(UserDoesNotExistException::new);
+        ApplicationUser user = userRepo.findByUsername(username).orElseThrow(UserDoesNotExistException::new);
 
-        user.setVerificationCode(generateVerificationNumber());
+        user.setVerification(generateVerificationNumber());
 
         try {
-            mailService.sendEmail(user.getEmail(), "Your verification code", "Here is your verification code : " + user.getVerificationCode());
-            userRepository.save(user);
+            mailService.sendEmail(user.getEmail(), "Your verification code", "Here is your verification code: " + user.getVerification());
+            userRepo.save(user);
         } catch (Exception e) {
+            // TODO Auto-generated catch block
             throw new EmailFailedToSendException();
         }
-        userRepository.save(user);
+
+        userRepo.save(user);
     }
 
-    public ApplicationUser verifyEmail (String username, Long code) {
-        ApplicationUser user = userRepository.findByUsername(username).orElseThrow(UserDoesNotExistException::new);
+    public ApplicationUser verifyEmail(String username, Long code) {
+        ApplicationUser user = userRepo.findByUsername(username).orElseThrow(UserDoesNotExistException::new);
 
-        if(code.equals(user.getVerificationCode())){
+        if(code.equals(user.getVerification())) {
             user.setEnabled(true);
-            user.setVerificationCode(null); //recheck in ep12
-            return userRepository.save(user);
+            user.setVerification(null);
+            return userRepo.save(user);
         } else {
             throw new IncorrectVerificationCodeException();
         }
+
     }
 
-    public ApplicationUser setPassword(String username, String password){
-        ApplicationUser user = userRepository.findByUsername(username).orElseThrow(UserDoesNotExistException::new);
+    public ApplicationUser setPassword(String username, String password) {
+
+        ApplicationUser user = userRepo.findByUsername(username).orElseThrow(UserDoesNotExistException::new);
 
         String encodedPassword = passwordEncoder.encode(password);
 
         user.setPassword(encodedPassword);
 
-        return userRepository.save(user);
+        return userRepo.save(user);
     }
+
 
     private String generateUsername(String name) {
         long generatedNumber = (long) Math.floor(Math.random() * 1_000_000_000);
@@ -148,15 +147,16 @@ public class UserService implements UserDetailsService{
     }
 
     private Long generateVerificationNumber() {
-       return (long) Math.floor(Math.random() * 1_000_000_000);
+        return (long) Math.floor(Math.random() * 100_000_000);
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        ApplicationUser u = userRepository.findByUsername(username).orElseThrow(()->new UsernameNotFoundException("User not found"));
+        ApplicationUser u = userRepo.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         Set<GrantedAuthority> authorities = u.getAuthorities()
-                        .stream()
+                .stream()
                 .map(role -> new SimpleGrantedAuthority(role.getAuthority()))
                 .collect(Collectors.toSet());
 
@@ -165,95 +165,107 @@ public class UserService implements UserDetailsService{
         return ud;
     }
 
-    public ApplicationUser setProfileOrBannnerPicture(String username, MultipartFile file, String prefix)throws UnableToSavePhotosException{
-        ApplicationUser user = userRepository.findByUsername(username).orElseThrow(UserDoesNotExistException::new);
+    public ApplicationUser setProfileOrBannerPicture(String username, MultipartFile file, String prefix) throws UnableToSavePhotoException {
+        ApplicationUser  user = userRepo.findByUsername(username).orElseThrow(UserDoesNotExistException::new);
+
         Image photo = imageService.uploadImage(file, prefix);
 
-        try{
-            if(prefix.equals("pfp")){
-                if(user.getProfilePicture() != null && user.getProfilePicture().getImageName().equals("defaultpfp.png")){
+        try {
+            if(prefix.equals("pfp")) {
+                if(user.getProfilePicture() != null && !user.getProfilePicture().getImageName().equals("defaultpfp.png")) {
                     Path p = Paths.get(user.getProfilePicture().getImagePath());
                     Files.deleteIfExists(p);
                 }
                 user.setProfilePicture(photo);
-            }else {
-                if(user.getBannerPicture() != null && user.getBannerPicture().getImageName().equals("defaultbnr.png"));
-                Path p = Paths.get(user.getBannerPicture().getImagePath());
-                Files.deleteIfExists(p);
+            } else {
+                if(user.getBannerPicture() != null && !user.getBannerPicture().getImageName().equals("defaultbnr.png")) {
+                    Path p = Paths.get(user.getBannerPicture().getImagePath());
+                    Files.deleteIfExists(p);
+                }
+                user.setBannerPicture(photo);
             }
-            user.setBannerPicture(photo);
-        }
-        catch (IOException e){
-            throw new UnableToSavePhotosException();
+        } catch (IOException e) {
+            throw new UnableToSavePhotoException();
         }
 
-        return userRepository.save(user);
+        return userRepo.save(user);
     }
 
-    public byte[] setUserOrganization(String username, MultipartFile file, String orgName) throws UnableToResolvePhotoException {
-        ApplicationUser user = userRepository.findByUsername(username).orElseThrow(UserDoesNotExistException::new);
+    public byte[] setUserOrganization(String username, MultipartFile file, String orgName) throws UnableToResolvePhotoException{
+        ApplicationUser user = userRepo.findByUsername(username).orElseThrow(UserDoesNotExistException::new);
         Image orgImage = imageService.getImageByImageName(orgName)
                 .orElseGet(() -> {
                     try{
                         return imageService.createOrganization(file, orgName);
-                    }catch(UnableToSavePhotosException e){
+                    } catch(UnableToSavePhotoException e) {
                         return null;
                     }
                 });
         if(orgImage != null){
-            //ep 149 minit 15:20
-        }else{
+
+            user.setOrganization(orgImage);
+            userRepo.save(user);
+
+            try{
+                return Files.readAllBytes(new File(orgImage.getImagePath()).toPath());
+            } catch(IOException e){
+                throw new UnableToResolvePhotoException();
+            }
+
+        } else {
             throw new UnableToResolvePhotoException("We were unable to find or save the organization photo");
         }
-
     }
 
     public Set<ApplicationUser> followUser(String user, String followee) throws FollowException{
 
-        if(user.equals(followee))throw new FollowException();
+        if(user.equals(followee)) throw new FollowException();
 
-        ApplicationUser loggedInUser = userRepository.findByUsername(user).orElseThrow(UserDoesNotExistException::new);
+        ApplicationUser loggedInUser = userRepo.findByUsername(user).orElseThrow(UserDoesNotExistException::new);
 
         Set<ApplicationUser> followingList = loggedInUser.getFollowing();
 
-        ApplicationUser followedUser = userRepository.findByUsername(followee).orElseThrow(UserDoesNotExistException::new);
+        ApplicationUser followedUser = userRepo.findByUsername(followee).orElseThrow(UserDoesNotExistException::new);
 
         Set<ApplicationUser> followersList = followedUser.getFollowers();
 
-        //Add the followed user to the following list
+        //Add the followed use to the following list
         followingList.add(followedUser);
         loggedInUser.setFollowing(followingList);
 
-        //Add the current user to the follower list of the followee
+        //Add the current user to the follwer list of the folowee
         followersList.add(loggedInUser);
         followedUser.setFollowers(followersList);
 
         //update both users
-        userRepository.save(loggedInUser);
-        userRepository.save(followedUser);
+        userRepo.save(loggedInUser);
+        userRepo.save(followedUser);
 
         return loggedInUser.getFollowing();
     }
 
     public Set<ApplicationUser> retrieveFollowingList(String username) {
 
-        ApplicationUser user = userRepository.findByUsername(username).orElseThrow(UserDoesNotExistException::new);
+        ApplicationUser user = userRepo.findByUsername(username).orElseThrow(UserDoesNotExistException::new);
+
         return user.getFollowing();
     }
 
     public Set<ApplicationUser> retrieveFollowersList(String username) {
-        ApplicationUser user = userRepository.findByUsername(username).orElseThrow(UserDoesNotExistException::new);
+        ApplicationUser user = userRepo.findByUsername(username).orElseThrow(UserDoesNotExistException::new);
+
         return user.getFollowers();
     }
 
-    public String verifyUsername(FindUsernameDTO credential){
-        ApplicationUser user = userRepository.findByEmailOrPhoneOrUsername(credential.getEmail(), credential.getPhone(), credential.getUsername())
+    public String verifyUsername(FindUsernameDTO credential) {
+        ApplicationUser user = userRepo.findByEmailOrPhoneOrUsername(credential.getEmail(), credential.getPhone(), credential.getUsername())
                 .orElseThrow(UserDoesNotExistException::new);
         return user.getUsername();
     }
 
-    public ApplicationUser getUsersEmailAndPhone(FindUsernameDTO credential){
-        return userRepository.findByEmailOrPhoneOrUsername(credential.getEmail(), credential.getPhone(), credential.getUsername())
+    public ApplicationUser getUsersEmailAndPhone(FindUsernameDTO credential) {
+        return userRepo.findByEmailOrPhoneOrUsername(credential.getEmail(), credential.getPhone(), credential.getUsername())
                 .orElseThrow(UserDoesNotExistException::new);
     }
+
 }

@@ -1,12 +1,17 @@
 package com.TweetForge.TweetForge.backend.controllers;
 
+
+import com.TweetForge.TweetForge.backend.dto.FeedPostDTO;
+import com.TweetForge.TweetForge.backend.dto.FeedRequestDTO;
+import com.TweetForge.TweetForge.backend.dto.FetchFeedReponseDTO;
 import com.TweetForge.TweetForge.backend.models.Post;
 import com.TweetForge.TweetForge.backend.services.FeedService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import com.TweetForge.TweetForge.backend.models.Post;
+import com.TweetForge.TweetForge.backend.services.FeedService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -22,11 +27,10 @@ public class FeedController {
         this.feedService = feedService;
     }
 
-    @GetMapping("/{userId}")
-    public List<Post> getPostsForFeed(@PathVariable("userId") Integer userId){
-        List<Post> feedPosts = feedService.getFeedForUser(userId);
-        Collections.sort(feedPosts);
-        return feedPosts;
+    @PostMapping
+    public FetchFeedReponseDTO getPostsForFeed(@RequestBody FeedRequestDTO feedRequest){
+        System.out.println(feedRequest);
+        return feedService.getFeedForUser(feedRequest.getUserId(), feedRequest.getSessionStart(), feedRequest.getPage());
     }
 
 }

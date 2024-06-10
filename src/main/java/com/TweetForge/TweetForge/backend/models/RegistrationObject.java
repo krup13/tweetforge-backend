@@ -42,7 +42,7 @@ public class RegistrationObject {
         this.email = email;
     }
 
-    public Date getDob() {
+    public java.sql.Date getDob() {
         return dob;
     }
 
