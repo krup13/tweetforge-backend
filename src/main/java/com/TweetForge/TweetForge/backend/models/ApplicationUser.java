@@ -1,35 +1,40 @@
 package com.TweetForge.TweetForge.backend.models;
 
+import java.sql.Date;
+import java.util.HashSet;
+import java.util.Set;
+
+import com.TweetForge.TweetForge.backend.models.Image;
+import com.TweetForge.TweetForge.backend.models.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
-import java.util.*;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name="users")
 public class ApplicationUser {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name="user_id")
     private Integer userId;
 
-    @Column(name = "first_name")
+    @Column(name="first_name")
     private String firstName;
 
-    @Column(name = "last_name")
+    @Column(name="last_name")
     private String lastName;
 
-    @Column(unique = true)
+    @Column(unique=true)
     private String email;
 
-    private String phoneNumber;
+    private String phone;
 
     @Column(name="dob")
     private Date dateOfBirth;
 
-    @Column(unique = true)
+    @Column(unique=true)
     private String username;
 
     @JsonIgnore
@@ -39,41 +44,41 @@ public class ApplicationUser {
 
     private String nickname;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade=CascadeType.ALL)
     @JoinColumn(name="profile_picture", referencedColumnName="image_id")
     private Image profilePicture;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade=CascadeType.ALL)
     @JoinColumn(name="banner_picture", referencedColumnName="image_id")
     private Image bannerPicture;
 
     @Column(name="verified_account", nullable = true)
-    private boolean verifiedAccount;
+    private Boolean verifiedAccount;
+
+    @Column(name="private_account", nullable=true)
+    private Boolean privateAccount;
 
     @ManyToOne
     @JoinColumn(name="organization_id", nullable = true)
     private Image organization;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch=FetchType.EAGER)
     @JoinTable(
             name="following",
-            joinColumns = {@JoinColumn(name="user_id")},
-            inverseJoinColumns =  {@JoinColumn(name="following_id")}
+            joinColumns= {@JoinColumn(name="user_id")},
+            inverseJoinColumns = {@JoinColumn(name="following_id")}
     )
-
     @JsonIgnore
     private Set<ApplicationUser> following;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch=FetchType.EAGER)
     @JoinTable(
             name="followers",
-            joinColumns = {@JoinColumn(name="user_id")},
-            inverseJoinColumns =  {@JoinColumn(name="followers_id")}
+            joinColumns= {@JoinColumn(name="user_id")},
+            inverseJoinColumns = {@JoinColumn(name="follower_id")}
     )
-
     @JsonIgnore
     private Set<ApplicationUser> followers;
-
 
     /* Security related */
 
@@ -83,25 +88,19 @@ public class ApplicationUser {
             joinColumns = {@JoinColumn(name="user_id")},
             inverseJoinColumns = {@JoinColumn(name="role_id")}
     )
-//     this code above defines a many-to-many relationship between two entities using a join table, with foreign key columns that reference the primary keys of the two entities. The fetch strategy is set to FetchType.EAGER, which means that the related entities will be fetched from the database as soon as the owning entity is queried.
-
     private Set<Role> authorities;
 
     private Boolean enabled;
 
-    @Column(nullable = true)
+    @Column(nullable=true)
     @JsonIgnore
-    private Long verificationCode;
-
-//    public ApplicationUser(Set<Role> authorities) {
-//        this.authorities = authorities;
-//    }
+    private Long verification;
 
     public ApplicationUser() {
         this.authorities = new HashSet<>();
         this.following = new HashSet<>();
         this.followers = new HashSet<>();
-        this.enabled = true;
+        this.enabled = false;
     }
 
     public Integer getUserId() {
@@ -136,12 +135,12 @@ public class ApplicationUser {
         this.email = email;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public Date getDateOfBirth() {
@@ -184,12 +183,12 @@ public class ApplicationUser {
         this.enabled = enabled;
     }
 
-    public Long getVerificationCode() {
-        return verificationCode;
+    public Long getVerification() {
+        return verification;
     }
 
-    public void setVerificationCode(Long verificationCode) {
-        this.verificationCode = verificationCode;
+    public void setVerification(Long verification) {
+        this.verification = verification;
     }
 
     public String getBio() {
@@ -240,11 +239,14 @@ public class ApplicationUser {
         this.followers = followers;
     }
 
-    public boolean isVerifiedAccount() {
+    public Boolean isVerifiedAccount() {
+        if(verifiedAccount == null){
+            return false;
+        }
         return verifiedAccount;
     }
 
-    public void setVerifiedAccount(boolean verifiedAccount) {
+    public void setVerifiedAccount(Boolean verifiedAccount) {
         this.verifiedAccount = verifiedAccount;
     }
 
@@ -256,6 +258,17 @@ public class ApplicationUser {
         this.organization = organization;
     }
 
+    public Boolean isPrivateAccount() {
+        if(privateAccount == null){
+            return false;
+        }
+        return privateAccount;
+    }
+
+    public void setPrivateAccount(Boolean privateAccount) {
+        this.privateAccount = privateAccount;
+    }
+
     @Override
     public String toString() {
         return "ApplicationUser{" +
@@ -263,7 +276,7 @@ public class ApplicationUser {
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
+                ", phone='" + phone + '\'' +
                 ", dateOfBirth=" + dateOfBirth +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
@@ -272,12 +285,13 @@ public class ApplicationUser {
                 ", profilePicture=" + profilePicture +
                 ", bannerPicture=" + bannerPicture +
                 ", verifiedAccount=" + verifiedAccount +
+                ", privateAccount=" + privateAccount +
                 ", organization=" + organization +
                 ", following=" + following +
                 ", followers=" + followers +
                 ", authorities=" + authorities +
                 ", enabled=" + enabled +
-                ", verificationCode=" + verificationCode +
+                ", verification=" + verification +
                 '}';
     }
 }

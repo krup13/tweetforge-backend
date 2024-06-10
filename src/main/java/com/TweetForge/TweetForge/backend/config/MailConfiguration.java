@@ -22,14 +22,12 @@ import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.List;
-
 import static org.springframework.boot.logging.LoggingSystemProperty.APPLICATION_NAME;
 
 @Configuration
 public class MailConfiguration {
 
-    //refer google's official github for setup
-    private static final String APPLICATION_NAME = "TweetForge";
+    private static final String APPLICATION_NAME = "Fwitter";
 
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
 
@@ -39,28 +37,30 @@ public class MailConfiguration {
 
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
-    //retrieving credentials for accessing Google APIs
-    private Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
+    private Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException{
 
         InputStream in = MailConfiguration.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
-        if (in == null) {
+
+        if(in == null) {
             throw new FileNotFoundException("Credentials file not found");
         }
 
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
-        GoogleAuthorizationCodeFlow flow;
-        flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
+        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
                 .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
-                        .setAccessType("offline")
-                            .build();
+                .setAccessType("offline")
+                .build();
 
-        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
-        return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
+        LocalServerReceiver reciever = new LocalServerReceiver.Builder().setPort(8888).build();
+
+        Credential credential = new AuthorizationCodeInstalledApp(flow, reciever).authorize("user");
+
+        return credential;
     }
 
     @Bean
-    public Gmail getGmailService() {
+    public Gmail getService() {
         NetHttpTransport HTTP_TRANSPORT;
 
         try {
@@ -69,11 +69,10 @@ public class MailConfiguration {
             return new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
                     .setApplicationName(APPLICATION_NAME)
                     .build();
-        } catch (GeneralSecurityException | IOException e){
+        }catch(GeneralSecurityException | IOException e) {
             e.printStackTrace();
             return null;
         }
     }
-}
 
-//problems in ep12 sighhhhh
+}

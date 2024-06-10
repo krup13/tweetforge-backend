@@ -42,7 +42,7 @@ public class TweetForgeBackendApplication {
 			u.setLastName("koder");
 			u.setEmail("unknownkoder@mail.com");
 			u.setUsername("unknownKoder");
-			u.setPhoneNumber("5555555555");
+			u.setPhone("5555555555");
 			u.setPassword(encoder.encode("password"));
 			u.setEnabled(true);
 			u.setVerifiedAccount(true);
