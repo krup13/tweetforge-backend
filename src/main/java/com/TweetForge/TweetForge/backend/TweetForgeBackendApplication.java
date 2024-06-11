@@ -38,25 +38,16 @@ public class TweetForgeBackendApplication {
 
 			ApplicationUser u = new ApplicationUser();
 			u.setAuthorities(roles);
-			u.setFirstName("unknown");
-			u.setLastName("koder");
-			u.setEmail("unknownkoder@mail.com");
-			u.setUsername("unknownKoder");
+			u.setFirstName("khaira");
+			u.setLastName("nafisa");
+			u.setEmail("logodit685@lapeds.com");
+			u.setUsername("khairanafisa");
 			u.setPhone("5555555555");
 			u.setPassword(encoder.encode("password"));
 			u.setEnabled(true);
 			u.setVerifiedAccount(true);
 
 			userRepository.save(u);
-
-			//creates a new Role object with an ID of 1 and an authority of "USER", and saves it to the db using the 'roleRepository'(obj)
-			/*ApplicationUser u = new ApplicationUser();
-
-			u.setFirstName("Khaira");
-			u.setLastName("Fuad");
-
-			userService.registerUser(u);
-*/
 		};
 	}
 }

@@ -23,7 +23,6 @@ public class DiscoveryController {
 
     @GetMapping("/users")
     public Set<ApplicationUser> searchForUsers(@RequestParam String searchTerm){
-        return discoveryService.searchForUser(searchTerm);
+        return discoveryService.searchForUsers(searchTerm);
     }
-
 }
