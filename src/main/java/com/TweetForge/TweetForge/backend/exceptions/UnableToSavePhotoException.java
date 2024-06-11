@@ -1,12 +1,12 @@
 package com.TweetForge.TweetForge.backend.exceptions;
 
-public class UnableToSavePhotosException extends Exception{
+public class UnableToSavePhotoException extends Exception{
     /**
      *
      */
     private static final long serialVersionUID = 1L;
 
-    public UnableToSavePhotosException() {
+    public UnableToSavePhotoException() {
         super("Unable to save the supplied photo");
     }
 }

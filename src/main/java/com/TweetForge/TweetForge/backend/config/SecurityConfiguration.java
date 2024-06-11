@@ -1,8 +1,9 @@
-package com.TweetForge.TweetForge.backend.config.;
+package com.TweetForge.TweetForge.backend.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -21,7 +22,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.TweetForge.TweetForge.backend.services.UserService;;
+import com.TweetForge.TweetForge.backend.services.UserService;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -68,14 +69,13 @@ public class SecurityConfiguration {
 
         return http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.disable())
-                .cors().configurationSource(corsConfigurationSource()).and()
+                .cors(cors -> cors.disable()).cors().configurationSource(corsConfigurationSource()).and()
                 .authorizeRequests(auth -> auth
-                        .dispatcherTypeMatchers("/auth/**").permitAll()
-                        .dispatcherTypeMatchers("/images/**").permitAll()
-                        .dispatcherTypeMatchers("/user/followers/**").permitAll()
-                        .dispatcherTypeMatchers("/user/following/**").permitAll()
-                        .dispatcherTypeMatchers("/posts/id/**").permitAll()
+                        .dispatcherTypeMatchers(HttpMethod.valueOf("/auth/**")).permitAll()
+                        .dispatcherTypeMatchers(HttpMethod.valueOf("/images/**")).permitAll()
+                        .dispatcherTypeMatchers(HttpMethod.valueOf("/user/followers/**")).permitAll()
+                        .dispatcherTypeMatchers(HttpMethod.valueOf("/user/following/**")).permitAll()
+                        .dispatcherTypeMatchers(HttpMethod.valueOf("/posts/id/**")).permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
