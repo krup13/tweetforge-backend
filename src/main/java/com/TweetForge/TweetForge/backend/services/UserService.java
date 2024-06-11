@@ -1,13 +1,14 @@
 package com.TweetForge.TweetForge.backend.services;
 
-import com.TweetForge.TweetForge.backend.dto.FindUsernameDTO;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import com.TweetForge.TweetForge.backend.exceptions.*;
-import com.TweetForge.TweetForge.backend.models.ApplicationUser;
-import com.TweetForge.TweetForge.backend.models.Image;
-import com.TweetForge.TweetForge.backend.models.RegistrationObject;
-import com.TweetForge.TweetForge.backend.models.Role;
-import com.TweetForge.TweetForge.backend.repositories.RoleRepository;
-import com.TweetForge.TweetForge.backend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,14 +20,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
+import com.TweetForge.TweetForge.backend.dto.FindUsernameDTO;
+import com.TweetForge.TweetForge.backend.models.ApplicationUser;
+import com.TweetForge.TweetForge.backend.models.Image;
+import com.TweetForge.TweetForge.backend.models.RegistrationObject;
+import com.TweetForge.TweetForge.backend.models.Role;
+import com.TweetForge.TweetForge.backend.repositories.RoleRepository;
+import com.TweetForge.TweetForge.backend.repositories.UserRepository;
 
 @Service
 public class UserService implements UserDetailsService{

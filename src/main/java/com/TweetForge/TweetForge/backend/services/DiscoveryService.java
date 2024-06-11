@@ -6,7 +6,6 @@ import com.TweetForge.TweetForge.backend.utils.DiscoveryUserComparator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -25,11 +24,11 @@ public class DiscoveryService {
         this.discoveryUserComparator = new DiscoveryUserComparator();
     }
 
-    public Set<ApplicationUser> searchForUser(String searchTerm){
+    public Set<ApplicationUser> searchForUsers(String searchTerm){
         List<ApplicationUser> usersByUsername = userRepository.findByUsernameContainingIgnoreCase(searchTerm);
         List<ApplicationUser> usersByNickname = userRepository.findByNicknameContainingIgnoreCase(searchTerm);
         List<ApplicationUser> usersByBio = userRepository.findByBioContainingIgnoreCase(searchTerm);
-        Set<ApplicationUser> combinedSet = (Set<ApplicationUser>) Stream.concat(
+        Set<ApplicationUser> combinedSet = Stream.concat(
                 usersByUsername.stream(),
                 Stream.concat(usersByNickname.stream(), usersByBio.stream())
         ).collect(Collectors.toSet());
@@ -37,7 +36,7 @@ public class DiscoveryService {
         Set<ApplicationUser> sortedApplicationUserSet = new TreeSet<>(discoveryUserComparator);
         sortedApplicationUserSet.addAll(combinedSet);
 
+
         return sortedApplicationUserSet;
     }
-
 }

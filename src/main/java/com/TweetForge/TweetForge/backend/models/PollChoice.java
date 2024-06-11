@@ -1,16 +1,25 @@
 package com.TweetForge.TweetForge.backend.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
-
 import java.util.Set;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name="poll_choices")
 public class PollChoice {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.AUTO)
     @Column(name="poll_choice_id")
     private Integer pollChoiceId;
 
@@ -25,7 +34,7 @@ public class PollChoice {
     @OneToMany
     private Set<ApplicationUser> votes;
 
-    public PollChoice(){
+    public PollChoice() {
         super();
     }
 
@@ -57,8 +66,8 @@ public class PollChoice {
         return choiceText;
     }
 
-    public void setChoiceText(String pollText) {
-        this.choiceText = pollText;
+    public void setPollText(String choiceText) {
+        this.choiceText = choiceText;
     }
 
     public Set<ApplicationUser> getVotes() {
@@ -71,11 +80,8 @@ public class PollChoice {
 
     @Override
     public String toString() {
-        return "PollChoice{" +
-                "pollChoiceId=" + pollChoiceId +
-                ", poll=" + poll.getPollId() +
-                ", choiceText='" + choiceText + '\'' +
-                ", votes=" + votes +
-                '}';
+        return "PollChoice [pollChoiceId=" + pollChoiceId + ", poll=" + poll.getPollId() + ", choiceText=" + choiceText + ", votes="
+                + votes + "]";
     }
+
 }

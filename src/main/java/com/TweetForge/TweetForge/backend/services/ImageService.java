@@ -1,18 +1,19 @@
 package com.TweetForge.TweetForge.backend.services;
 
-import com.TweetForge.TweetForge.backend.exceptions.UnableToResolvePhotoException;
-import com.TweetForge.TweetForge.backend.exceptions.UnableToSavePhotosException;
-import com.TweetForge.TweetForge.backend.models.Image;
-import com.TweetForge.TweetForge.backend.repositories.ImageRepository;
-import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.TweetForge.TweetForge.backend.exceptions.UnableToResolvePhotoException;
+import com.TweetForge.TweetForge.backend.exceptions.UnableToSavePhotoException;
+import com.TweetForge.TweetForge.backend.models.Image;
+import com.TweetForge.TweetForge.backend.repositories.ImageRepository;
 
 @Service
 @Transactional
@@ -20,24 +21,23 @@ public class ImageService {
 
     private final ImageRepository imageRepository;
 
-    private static final File DIRECTORY = new File("C:\\Users\\ifahz\\tweetforge-backend\\img");
-    private static final String URL ="http://localhost:8000/images/";
+    private static final File DIRECTORY = new File("C:\\Users\\Ethan\\Desktop\\LetsBuildTwitter\\fwitter-backend\\img");
+    private static final String URL = "http://localhost:8000/images/";
 
     @Autowired
     public ImageService(ImageRepository imageRepository) {
         this.imageRepository = imageRepository;
     }
 
-    public Optional<Image> getImageByImageName(String name){
+    public Optional<Image> getImageByImageName(String name) {
         return imageRepository.findByImageName(name);
     }
-
-    public Image saveGifFromPost(Image image){
+    public Image saveGifFromPost(Image image) {
         return imageRepository.save(image);
     }
 
-    public Image uploadImage(MultipartFile file, String prefix) throws UnableToSavePhotosException {
-        try{
+    public Image uploadImage(MultipartFile file, String prefix) throws UnableToSavePhotoException{
+        try {
             //The content type from the request looks something like this img/jpeg
             String extension = "." + file.getContentType().split("/")[1];
 
@@ -53,16 +53,16 @@ public class ImageService {
 
             return saved;
 
-        }catch(IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
-            throw new UnableToSavePhotosException();
+            throw new UnableToSavePhotoException();
         }
     }
 
-    public Image createOrganization(MultipartFile file, String organziationName)throws UnableToSavePhotosException{
+    public Image createOrganization(MultipartFile file, String organizationName) throws UnableToSavePhotoException {
         try{
             String extension = "." + file.getContentType().split("/")[1];
-            File orgImg = new File(DIRECTORY + "//" + organziationName + extension);
+            File orgImg = new File(DIRECTORY + "\\" + organizationName + extension);
             orgImg.createNewFile();
             file.transferTo(orgImg);
 
@@ -70,33 +70,32 @@ public class ImageService {
 
             Image i = new Image(orgImg.getName(), file.getContentType(), orgImg.getPath(), imageURL);
 
-            Image saved = imageRepository.save(i);
-
             return imageRepository.save(i);
 
-        }catch(IOException e){
+        } catch(IOException e){
             e.printStackTrace();
-            throw new UnableToSavePhotosException();
+            throw new UnableToSavePhotoException();
         }
     }
 
-    public byte[] downloadImage(String fileName) throws UnableToResolvePhotoException {
-        try{
-            Image image = imageRepository.findByImageName(fileName).get();
+    public byte[] downloadImage(String filename) throws UnableToResolvePhotoException{
+        try {
+            Image image = imageRepository.findByImageName(filename).get();
 
             String filePath = image.getImagePath();
 
             byte[] imageBytes = Files.readAllBytes(new File(filePath).toPath());
 
             return imageBytes;
-        }catch (IOException e){
+        } catch(IOException e) {
             throw new UnableToResolvePhotoException();
         }
     }
 
-    public String getImageType(String fileName){
+    public String getImageType(String fileName) {
         Image image = imageRepository.findByImageName(fileName).get();
 
         return image.getImageType();
     }
+
 }

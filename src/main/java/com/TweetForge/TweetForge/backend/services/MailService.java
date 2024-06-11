@@ -1,18 +1,21 @@
 package com.TweetForge.TweetForge.backend.services;
 
-import com.TweetForge.TweetForge.backend.exceptions.EmailFailedToSendException;
-import com.google.api.services.gmail.Gmail;
-import com.google.api.services.gmail.model.Message;
+import java.io.ByteArrayOutputStream;
+import java.util.Properties;
+
 import jakarta.mail.Session;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
+
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayOutputStream;
-import java.util.Properties;
-
+import com.TweetForge.TweetForge.backend.exceptions.EmailFailedToSendException;
+import com.google.api.client.googleapis.json.GoogleJsonError;
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
+import com.google.api.services.gmail.Gmail;
+import com.google.api.services.gmail.model.Message;
 
 @Service
 public class MailService {
@@ -32,8 +35,8 @@ public class MailService {
         MimeMessage email = new MimeMessage(session);
 
         try {
-            email.setFrom(new InternetAddress("ifahzara@gmail.com"));
-            email.addRecipient(jakarta.mail.Message.RecipientType.TO, new InternetAddress("ifahzara@gmail.com"));
+            email.setFrom(new InternetAddress("unknownkoderyt@gmail.com"));
+            email.addRecipient(jakarta.mail.Message.RecipientType.TO, new InternetAddress(toAddress));
             email.setSubject(subject);
             email.setText(content);
 
@@ -49,8 +52,9 @@ public class MailService {
             message.setRaw(encodedEmail);
 
             message = gmail.users().messages().send("me", message).execute();
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new EmailFailedToSendException();
         }
     }
+
 }

@@ -1,7 +1,13 @@
 package com.TweetForge.TweetForge.backend.models;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
 
 @Entity
 @Table(name="images")
@@ -9,11 +15,10 @@ public class Image {
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
-
     @Column(name="image_id")
     private Long imageId;
 
-    @Column(name="image_name", unique = true)
+    @Column(name="image_name", unique=true)
     private String imageName;
 
     @Column(name="image_type")
@@ -89,12 +94,7 @@ public class Image {
 
     @Override
     public String toString() {
-        return "Image{" +
-                "imageId=" + imageId +
-                ", imageName='" + imageName + '\'' +
-                ", imageType='" + imageType + '\'' +
-                ", imagePath='" + imagePath + '\'' +
-                ", imageURL='" + imageURL + '\'' +
-                '}';
+        return "Image [imageId=" + imageId + ", imageName=" + imageName + ", imageType=" + imageType + ", imagePath="
+                + imagePath + ", imageURL=" + imageURL + "]";
     }
 }
