@@ -8,11 +8,11 @@ public class PollVoteDTO {
     private Integer choiceId;
     private Integer userId;
 
-    public PollVoteDTO(){
+    public PollVoteDTO() {
         super();
     }
 
-    public PollVoteDTO(Integer choiceId, Integer userId){
+    public PollVoteDTO(Integer choiceId, Integer userId) {
         super();
         this.choiceId = choiceId;
         this.userId = userId;
@@ -36,9 +36,6 @@ public class PollVoteDTO {
 
     @Override
     public String toString() {
-        return "PollVoteDTO{" +
-                "choiceId=" + choiceId +
-                ", userId=" + userId +
-                '}';
+        return "PollVoteDTO [choiceId=" + choiceId + ", userId=" + userId + "]";
     }
 }

@@ -1,9 +1,14 @@
 package com.TweetForge.TweetForge.backend.dto;
 
 public class FindUsernameDTO {
+
     private String email;
     private String phone;
     private String username;
+
+    public FindUsernameDTO() {
+        super();
+    }
 
     public FindUsernameDTO(String email, String phone, String username) {
         super();
@@ -38,10 +43,7 @@ public class FindUsernameDTO {
 
     @Override
     public String toString() {
-        return "FindUsernameDTO{" +
-                "email='" + email + '\'' +
-                ", phone='" + phone + '\'' +
-                ", username='" + username + '\'' +
-                '}';
+        return "FindUsernameDTO [email=" + email + ", phone=" + phone + ", username=" + username + "]";
     }
+
 }

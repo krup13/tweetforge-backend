@@ -1,10 +1,16 @@
 package com.TweetForge.TweetForge.backend.dto;
 
-import com.TweetForge.TweetForge.backend.models.*;
-
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+
+import com.TweetForge.TweetForge.backend.models.ApplicationUser;
+import com.TweetForge.TweetForge.backend.models.Audience;
+import com.TweetForge.TweetForge.backend.models.Image;
+import com.TweetForge.TweetForge.backend.models.Poll;
+import com.TweetForge.TweetForge.backend.models.Post;
+import com.TweetForge.TweetForge.backend.models.ReplyRestriction;
 
 public class CreatePostDTO {
 
@@ -13,17 +19,17 @@ public class CreatePostDTO {
     Set<Post> replies;
     private List<Image> images;
     private Boolean scheduled;
-    private Date scheduledDate;
+    private LocalDateTime scheduledDate;
     private Audience audience;
     private ReplyRestriction replyRestriction;
     private Poll poll;
 
-    public CreatePostDTO(){
+    public CreatePostDTO() {
         super();
     }
 
     public CreatePostDTO(String content, ApplicationUser author, Set<Post> replies, List<Image> images, Boolean scheduled,
-                         Date scheduledDate,Audience audience, ReplyRestriction replyRestriction, Poll poll){
+                         LocalDateTime scheduledDate, Audience audience, ReplyRestriction replyRestriction, Poll poll) {
         super();
         this.content = content;
         this.author = author;
@@ -60,6 +66,7 @@ public class CreatePostDTO {
         this.replies = replies;
     }
 
+
     public List<Image> getImages() {
         return images;
     }
@@ -76,11 +83,11 @@ public class CreatePostDTO {
         this.scheduled = scheduled;
     }
 
-    public Date getScheduledDate() {
+    public LocalDateTime getScheduledDate() {
         return scheduledDate;
     }
 
-    public void setScheduledDate(Date scheduledDate) {
+    public void setScheduledDate(LocalDateTime scheduledDate) {
         this.scheduledDate = scheduledDate;
     }
 
@@ -100,6 +107,8 @@ public class CreatePostDTO {
         this.replyRestriction = replyRestriction;
     }
 
+
+
     public Poll getPoll() {
         return poll;
     }
@@ -110,16 +119,10 @@ public class CreatePostDTO {
 
     @Override
     public String toString() {
-        return "CreatePostDTO{" +
-                "content='" + content + '\'' +
-                ", author=" + author +
-                ", replies=" + replies +
-                ", images=" + images +
-                ", scheduled=" + scheduled +
-                ", scheduledDate=" + scheduledDate +
-                ", audience=" + audience +
-                ", replyRestriction=" + replyRestriction +
-                ", poll=" + poll +
-                '}';
+        return "CreatePostDTO [content=" + content + ", author=" + author + ", replies=" + replies + ", images="
+                + images + ", scheduled=" + scheduled + ", scheduledDate=" + scheduledDate + ", audience=" + audience
+                + ", replyRestriction=" + replyRestriction + ", poll=" + poll + "]";
     }
+
+
 }
