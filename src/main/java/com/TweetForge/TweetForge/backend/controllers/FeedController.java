@@ -1,13 +1,8 @@
 package com.TweetForge.TweetForge.backend.controllers;
 
-
 import com.TweetForge.TweetForge.backend.dto.FeedPostDTO;
 import com.TweetForge.TweetForge.backend.dto.FeedRequestDTO;
-import com.TweetForge.TweetForge.backend.dto.FetchFeedReponseDTO;
-import com.TweetForge.TweetForge.backend.models.Post;
-import com.TweetForge.TweetForge.backend.services.FeedService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import com.TweetForge.TweetForge.backend.dto.FetchFeedResponseDTO;
 import com.TweetForge.TweetForge.backend.models.Post;
 import com.TweetForge.TweetForge.backend.services.FeedService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +23,7 @@ public class FeedController {
     }
 
     @PostMapping
-    public FetchFeedReponseDTO getPostsForFeed(@RequestBody FeedRequestDTO feedRequest){
+    public FetchFeedResponseDTO getPostsForFeed(@RequestBody FeedRequestDTO feedRequest){
         System.out.println(feedRequest);
         return feedService.getFeedForUser(feedRequest.getUserId(), feedRequest.getSessionStart(), feedRequest.getPage());
     }

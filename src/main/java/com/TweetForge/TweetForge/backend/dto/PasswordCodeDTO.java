@@ -5,7 +5,12 @@ public class PasswordCodeDTO {
     private int code;
     private String email;
 
+    public PasswordCodeDTO() {
+        super();
+    }
+
     public PasswordCodeDTO(int code, String email) {
+        super();
         this.code = code;
         this.email = email;
     }
@@ -28,9 +33,6 @@ public class PasswordCodeDTO {
 
     @Override
     public String toString() {
-        return "PasswordCodeDTO{" +
-                "code=" + code +
-                ", email='" + email + '\'' +
-                '}';
+        return "PasswordCodeDTO [code=" + code + ", email=" + email + "]";
     }
 }
