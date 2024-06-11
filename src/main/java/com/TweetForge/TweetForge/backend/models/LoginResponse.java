@@ -1,8 +1,13 @@
 package com.TweetForge.TweetForge.backend.models;
 
 public class LoginResponse {
+
     private ApplicationUser user;
     private String token;
+
+    public LoginResponse() {
+        super();
+    }
 
     public LoginResponse(ApplicationUser user, String token) {
         super();
@@ -27,7 +32,8 @@ public class LoginResponse {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return "LoginResponse [user=" + user + ", token=" + token + "]";
     }
+
 }

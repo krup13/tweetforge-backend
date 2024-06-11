@@ -1,92 +1,105 @@
 package com.TweetForge.TweetForge.backend.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import jakarta.persistence.*;
 
-import java.util.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.data.domain.Page;
 
 @Entity
 @Table(name="posts")
-public class Post implements Comparable<Post> {
+public class Post implements Comparable<Post>{
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "post_id")
-    private Integer post;
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @Column(name="post_id")
+    private Integer postId;
 
-    @Column(length = 256, nullable = false)
+    @Column(length=256, nullable=false)
     private String content;
 
-    @Column(name = "posted_date")
-    private Date postedDate;
+    @Column(name="posted_date")
+    private LocalDateTime postedDate;
+
+    @Column(name="is_reply", nullable=true)
+    private Boolean reply;
+
+    @Column(name="reply_to")
+    private Integer replyTo;
 
     @ManyToOne
-    @JoinColumn(name = "author_id", nullable = false)
+    @JoinColumn(name="author_id", nullable=false)
     private ApplicationUser author;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch=FetchType.EAGER)
     @JoinTable(
-            name = "post_likes_junction",
-            joinColumns = {@JoinColumn(name = "post_id")},
-            inverseJoinColumns = {@JoinColumn(name = "user_id")}
+            name="post_likes_junction",
+            joinColumns= {@JoinColumn(name="post_id")},
+            inverseJoinColumns= {@JoinColumn(name="user_id")}
     )
     private Set<ApplicationUser> likes;
 
     @OneToMany
     private List<Image> images;
 
-    //TODO: figure out video upload
+    //TODO: Figure out video upload
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch=FetchType.EAGER)
     @JoinTable(
-            name = "post_reply_junction",
-            joinColumns = {@JoinColumn(name = "post_id")},
-            inverseJoinColumns = {@JoinColumn(name = "reply_id")}
+            name="post_reply_junction",
+            joinColumns= {@JoinColumn(name="post_id")},
+            inverseJoinColumns = {@JoinColumn(name="reply_id")}
     )
-    @JsonIgnore
     private Set<Post> replies;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch=FetchType.EAGER)
     @JoinTable(
-            name = "post_repost_junction",
-            joinColumns = {@JoinColumn(name = "post_id")},
-            inverseJoinColumns = {@JoinColumn(name = "user_id")}
+            name="post_repost_junction",
+            joinColumns = {@JoinColumn(name="post_id")},
+            inverseJoinColumns = {@JoinColumn(name="user_id")}
     )
     private Set<ApplicationUser> reposts;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch=FetchType.EAGER)
     @JoinTable(
-            name = "post_bookmark_junction",
-            joinColumns = {@JoinColumn(name = "post_id")},
-            inverseJoinColumns = {@JoinColumn(name = "user_id")}
+            name="post_bookmark_junction",
+            joinColumns= {@JoinColumn(name="post_id")},
+            inverseJoinColumns = {@JoinColumn(name="user_id")}
     )
     private Set<ApplicationUser> bookmarks;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch=FetchType.EAGER)
     @JoinTable(
-            name = "post_view_junction",
-            joinColumns = {@JoinColumn(name = "post_id")},
-            inverseJoinColumns = {@JoinColumn(name = "user_id")}
+            name="post_view_junction",
+            joinColumns= {@JoinColumn(name="post_id")},
+            inverseJoinColumns = {@JoinColumn(name="user_id")}
     )
     private Set<ApplicationUser> views;
 
-    private Boolean schedule;
+    private Boolean scheduled;
 
-    @Column(name = "scheduled_date", nullable = true)
-    private Date scheduleDate;
+    @Column(name="scheduled_date", nullable=true)
+    private LocalDateTime scheduledDate;
 
     @Enumerated(EnumType.ORDINAL)
     private Audience audience;
 
     @Enumerated(EnumType.ORDINAL)
-    @Column(name = "reply_restriction")
+    @Column(name="reply_restriction")
     private ReplyRestriction replyRestriction;
 
     @OneToOne(cascade=CascadeType.ALL)
-    @JoinColumn(name="poll_id", referencedColumnName = "poll_id")
+    @JoinColumn(name="poll_id", referencedColumnName="poll_id")
     private Poll poll;
 
-    public Post(){
+    public Post() {
         super();
         this.likes = new HashSet<>();
         this.images = new ArrayList<>();
@@ -96,14 +109,12 @@ public class Post implements Comparable<Post> {
         this.views = new HashSet<>();
     }
 
-    public Post(Integer post, String content, Date postedDate, ApplicationUser author,
-                Set<ApplicationUser> likes, List<Image> images, Set<Post> replies,
-                Set<ApplicationUser> reposts, Set<ApplicationUser> bookmarks, Set<ApplicationUser> views,
-                Boolean schedule, Date scheduleDate, Audience audience, ReplyRestriction replyRestriction, Poll poll){
-        super();
-        this.post = post;
+    public Post(Integer postId, String content, LocalDateTime postedDate, Boolean reply, Integer replyTo, ApplicationUser author, Set<ApplicationUser> likes, List<Image> images, Set<Post> replies, Set<ApplicationUser> reposts, Set<ApplicationUser> bookmarks, Set<ApplicationUser> views, Boolean scheduled, LocalDateTime scheduledDate, Audience audience, ReplyRestriction replyRestriction, Poll poll) {
+        this.postId = postId;
         this.content = content;
         this.postedDate = postedDate;
+        this.reply = reply;
+        this.replyTo = replyTo;
         this.author = author;
         this.likes = likes;
         this.images = images;
@@ -111,19 +122,19 @@ public class Post implements Comparable<Post> {
         this.reposts = reposts;
         this.bookmarks = bookmarks;
         this.views = views;
-        this.schedule = schedule;
-        this.scheduleDate = scheduleDate;
+        this.scheduled = scheduled;
+        this.scheduledDate = scheduledDate;
         this.audience = audience;
         this.replyRestriction = replyRestriction;
         this.poll = poll;
     }
 
     public Integer getPost() {
-        return post;
+        return postId;
     }
 
-    public void setPost(Integer post) {
-        this.post = post;
+    public void setPost(Integer postId) {
+        this.postId = postId;
     }
 
     public String getContent() {
@@ -134,11 +145,11 @@ public class Post implements Comparable<Post> {
         this.content = content;
     }
 
-    public Date getPostedDate() {
+    public LocalDateTime getPostedDate() {
         return postedDate;
     }
 
-    public void setPostedDate(Date postedDate) {
+    public void setPostedDate(LocalDateTime postedDate) {
         this.postedDate = postedDate;
     }
 
@@ -198,20 +209,20 @@ public class Post implements Comparable<Post> {
         this.views = views;
     }
 
-    public Boolean getSchedule() {
-        return schedule;
+    public Boolean getScheduled() {
+        return scheduled;
     }
 
-    public void setSchedule(Boolean schedule) {
-        this.schedule = schedule;
+    public void setScheduled(Boolean scheduled) {
+        this.scheduled = scheduled;
     }
 
-    public Date getScheduleDate() {
-        return scheduleDate;
+    public LocalDateTime getScheduledDate() {
+        return scheduledDate;
     }
 
-    public void setScheduleDate(Date scheduleDate) {
-        this.scheduleDate = scheduleDate;
+    public void setScheduledDate(LocalDateTime scheduledDate) {
+        this.scheduledDate = scheduledDate;
     }
 
     public Audience getAudience() {
@@ -238,12 +249,41 @@ public class Post implements Comparable<Post> {
         this.poll = poll;
     }
 
+    public Boolean getReply() {
+        if(reply == null){
+            return false;
+        }
+        return reply;
+    }
+
+    public void setReply(Boolean reply) {
+        this.reply = reply;
+    }
+
+    public Integer getPostId() {
+        return postId;
+    }
+
+    public void setPostId(Integer postId) {
+        this.postId = postId;
+    }
+
+    public Integer getReplyTo() {
+        return replyTo;
+    }
+
+    public void setReplyTo(Integer replyTo) {
+        this.replyTo = replyTo;
+    }
+
     @Override
     public String toString() {
         return "Post{" +
-                "post=" + post +
+                "postId=" + postId +
                 ", content='" + content + '\'' +
                 ", postedDate=" + postedDate +
+                ", reply=" + reply +
+                ", replyTo=" + replyTo +
                 ", author=" + author +
                 ", likes=" + likes +
                 ", images=" + images +
@@ -251,8 +291,8 @@ public class Post implements Comparable<Post> {
                 ", reposts=" + reposts +
                 ", bookmarks=" + bookmarks +
                 ", views=" + views +
-                ", schedule=" + schedule +
-                ", scheduleDate=" + scheduleDate +
+                ", scheduled=" + scheduled +
+                ", scheduledDate=" + scheduledDate +
                 ", audience=" + audience +
                 ", replyRestriction=" + replyRestriction +
                 ", poll=" + poll +
@@ -261,6 +301,6 @@ public class Post implements Comparable<Post> {
 
     @Override
     public int compareTo(Post o) {
-        return -this.postedDate.compareTo((o.postedDate));
+        return -this.postedDate.compareTo(o.postedDate);
     }
 }
