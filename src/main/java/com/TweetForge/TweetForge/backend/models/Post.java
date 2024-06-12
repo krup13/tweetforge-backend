@@ -38,7 +38,7 @@ public class Post implements Comparable<Post>{
     @JoinColumn(name="author_id", nullable=false)
     private ApplicationUser author;
 
-    @ManyToMany(fetch=FetchType.EAGER)
+    @ManyToMany(fetch=FetchType.LAZY)
     @JoinTable(
             name="post_likes_junction",
             joinColumns= {@JoinColumn(name="post_id")},
@@ -51,7 +51,7 @@ public class Post implements Comparable<Post>{
 
     //TODO: Figure out video upload
 
-    @ManyToMany(fetch=FetchType.EAGER)
+    @ManyToMany(fetch=FetchType.LAZY)
     @JoinTable(
             name="post_reply_junction",
             joinColumns= {@JoinColumn(name="post_id")},
@@ -59,7 +59,7 @@ public class Post implements Comparable<Post>{
     )
     private Set<Post> replies;
 
-    @ManyToMany(fetch=FetchType.EAGER)
+    @ManyToMany(fetch=FetchType.LAZY)
     @JoinTable(
             name="post_repost_junction",
             joinColumns = {@JoinColumn(name="post_id")},
@@ -67,7 +67,7 @@ public class Post implements Comparable<Post>{
     )
     private Set<ApplicationUser> reposts;
 
-    @ManyToMany(fetch=FetchType.EAGER)
+    @ManyToMany(fetch=FetchType.LAZY)
     @JoinTable(
             name="post_bookmark_junction",
             joinColumns= {@JoinColumn(name="post_id")},
@@ -75,7 +75,7 @@ public class Post implements Comparable<Post>{
     )
     private Set<ApplicationUser> bookmarks;
 
-    @ManyToMany(fetch=FetchType.EAGER)
+    @ManyToMany(fetch=FetchType.LAZY)
     @JoinTable(
             name="post_view_junction",
             joinColumns= {@JoinColumn(name="post_id")},
@@ -97,7 +97,7 @@ public class Post implements Comparable<Post>{
     private ReplyRestriction replyRestriction;
 
     @OneToOne(cascade=CascadeType.ALL)
-    @JoinColumn(name="poll_id", referencedColumnName="poll_id")
+    @JoinColumn(name="poll_id", referencedColumnName="poll_id", nullable = true)
     private Poll poll;
 
     public Post() {
