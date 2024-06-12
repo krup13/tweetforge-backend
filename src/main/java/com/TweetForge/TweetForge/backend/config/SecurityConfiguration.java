@@ -7,6 +7,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -69,7 +70,7 @@ public class SecurityConfiguration {
         
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.disable())
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests().anyRequest().permitAll();
         return http.build();
     }

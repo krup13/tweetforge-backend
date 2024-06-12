@@ -13,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/feed")
+@CrossOrigin("*")
 public class FeedController {
 
     private final FeedService feedService;
