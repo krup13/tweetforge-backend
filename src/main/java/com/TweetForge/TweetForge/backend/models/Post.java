@@ -22,14 +22,14 @@ public class Post implements Comparable<Post>{
     @Column(name="post_id")
     private Integer postId;
 
-    @Column(length=256, nullable=false)
+    @Column(length=512, nullable=false)
     private String content;
 
     @Column(name="posted_date")
     private LocalDateTime postedDate;
 
-    @Column(name="is_reply", nullable=true)
-    private Boolean reply;
+    @Column(name="is_reply", nullable=false)
+    private Boolean reply=true;
 
     @Column(name="reply_to")
     private Integer replyTo;
@@ -83,7 +83,8 @@ public class Post implements Comparable<Post>{
     )
     private Set<ApplicationUser> views;
 
-    private Boolean scheduled;
+    @Column(name="scheduled", nullable=false)
+    private Boolean scheduled=false;
 
     @Column(name="scheduled_date", nullable=true)
     private LocalDateTime scheduledDate;
