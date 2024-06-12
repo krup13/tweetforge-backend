@@ -34,7 +34,7 @@ public class PostController {
         this.userService = userService;
     }
 
-    @GetMapping("/")
+    @GetMapping("/all")
     public List<Post> getAllPosts(){
         return postService.getAllPosts();
     }
