@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -26,13 +27,18 @@ public class FeedService {
     public FetchFeedResponseDTO getFeedForUser(Integer id, LocalDateTime sessionStart, Integer page){
 
         ApplicationUser currentUser = userService.getUserById(id);
+        System.out.println(currentUser == null);
 
         Set<ApplicationUser> following = currentUser.getFollowing();
         following.add(currentUser);
-
-        Page<Post> followingPosts = postService.getFeedPage(id, sessionStart, page);
-        List<FeedPostDTO> feedPostDTOs = followingPosts.map(post -> {
+        
+        List<Post> allPosts = postService.getAllPosts();
+        System.out.println("Posts size : " + allPosts.size());
+        List<FeedPostDTO> feedPostDTOs = new ArrayList<>();
+        
+        for(int i = 0; i < allPosts.size(); i++) {
             FeedPostDTO feedPostDTO = new FeedPostDTO();
+            Post post = allPosts.get(i);
             feedPostDTO.setPost(post);
             feedPostDTO.setReply(post.getReply() ? postService.getPostById(post.getReplyTo()) : null);
             feedPostDTO.setRepost(!post.getAuthor().getFollowers().contains(userService.getUserById(id)) && !post.getAuthor().equals(userService.getUserById(id)));
@@ -42,9 +48,8 @@ public class FeedService {
                             :
                             null
             );
-            return feedPostDTO;
-        }).toList();
-
+            feedPostDTOs.add(feedPostDTO);
+        }
         // Map these to a new DTO for the feed itself
 
         //List<Post> allPosts = new ArrayList<>();
