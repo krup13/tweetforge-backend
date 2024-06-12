@@ -9,7 +9,7 @@ insert into users(email, enabled, first_name, last_name, nickname, password, use
 insert into users(first_name, last_name, email, username, password, bio, nickname, verified_account, private_account)
 values ('Unknown', 'Koder', 'email@email.com', 'unknownkoder', '$2a$10$NVz6lYlNrOs0ldHOF93kE.9/EfKQ6G9Z7dHW4O9tmaTydIAJREk.q', 'Software Engineer', 'Unknown Koder', true, false);
 
-insert into user_role_junction values (1,1), (2,1), (3,1), (4,1), (5,1);
+insert into user_role_junction values (1,1);
 
 insert into following values (5, 1), (5, 2), (5, 3);
 insert into followers values (1, 5), (2, 5), (3, 5);

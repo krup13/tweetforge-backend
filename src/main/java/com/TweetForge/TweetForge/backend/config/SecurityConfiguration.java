@@ -66,21 +66,12 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
-        return http
+        
+        http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.disable()).cors().configurationSource(corsConfigurationSource()).and()
-                .authorizeRequests(auth -> auth
-                        .dispatcherTypeMatchers(HttpMethod.valueOf("/auth/**")).permitAll()
-                        .dispatcherTypeMatchers(HttpMethod.valueOf("/images/**")).permitAll()
-                        .dispatcherTypeMatchers(HttpMethod.valueOf("/user/followers/**")).permitAll()
-                        .dispatcherTypeMatchers(HttpMethod.valueOf("/user/following/**")).permitAll()
-                        .dispatcherTypeMatchers(HttpMethod.valueOf("/posts/id/**")).permitAll()
-                        .anyRequest().authenticated()
-                )
-                .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .build();
+                .cors(cors -> cors.disable())
+                .authorizeHttpRequests().anyRequest().permitAll();
+        return http.build();
     }
 
     @Bean
