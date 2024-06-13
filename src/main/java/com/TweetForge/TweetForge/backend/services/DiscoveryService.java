@@ -1,6 +1,8 @@
 package com.TweetForge.TweetForge.backend.services;
 
 import com.TweetForge.TweetForge.backend.models.ApplicationUser;
+import com.TweetForge.TweetForge.backend.models.Post;
+import com.TweetForge.TweetForge.backend.repositories.PostRepository;
 import com.TweetForge.TweetForge.backend.repositories.UserRepository;
 import com.TweetForge.TweetForge.backend.utils.DiscoveryUserComparator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +19,11 @@ public class DiscoveryService {
 
     private final UserRepository userRepository;
     private final DiscoveryUserComparator discoveryUserComparator;
+    private final PostRepository postRepository;
 
     @Autowired
-    public DiscoveryService(UserRepository userRepository){
+    public DiscoveryService(UserRepository userRepository, PostRepository postRepository){
+        this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.discoveryUserComparator = new DiscoveryUserComparator();
     }
@@ -39,4 +43,9 @@ public class DiscoveryService {
 
         return sortedApplicationUserSet;
     }
+
+    public Set<Post> searchForPosts(String searchTerm){
+        return postRepository.searchForPosts(searchTerm);
+    }
+
 }

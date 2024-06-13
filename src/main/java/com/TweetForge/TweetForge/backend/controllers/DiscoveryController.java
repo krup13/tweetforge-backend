@@ -1,6 +1,7 @@
 package com.TweetForge.TweetForge.backend.controllers;
 
 import com.TweetForge.TweetForge.backend.models.ApplicationUser;
+import com.TweetForge.TweetForge.backend.models.Post;
 import com.TweetForge.TweetForge.backend.services.DiscoveryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +20,14 @@ public class DiscoveryController {
         this.discoveryService = discoveryService;
     }
 
+
     @GetMapping("/users")
     public Set<ApplicationUser> searchForUsers(@RequestParam String searchTerm){
         return discoveryService.searchForUsers(searchTerm);
+    }
+
+    @GetMapping("/posts")
+    public Set<Post> searchForPosts(@RequestParam String searchTerm) {
+        return discoveryService.searchForPosts(searchTerm);
     }
 }

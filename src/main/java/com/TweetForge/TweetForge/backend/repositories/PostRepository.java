@@ -44,4 +44,7 @@ public interface PostRepository extends JpaRepository<Post, Integer>{
             countQuery = "select count(*) from (" + FEED_QUERY + ")"
     )
     public Page<Post> findFeedPosts(@Param("id") Integer id, @Param("session_start") LocalDateTime sessionDate, Pageable pageable);
+
+    @Query("SELECT p FROM Post p WHERE p.content LIKE %:searchTerm%")
+    Set<Post> searchForPosts(@Param("searchTerm") String searchTerm);
 }
