@@ -64,12 +64,8 @@ public class PostService {
 
         Post p = new Post();
         p.setContent(dto.getContent());
-        if (dto.getScheduled()) {
-            p.setPostedDate(dto.getScheduledDate());
-        } else {
-            p.setPostedDate(LocalDateTime.now());
-            System.out.println(LocalDateTime.now());
-        }
+        p.setPostedDate(LocalDateTime.now());
+        System.out.println(LocalDateTime.now());
         p.setAuthor(dto.getAuthor());
         p.setReplies(dto.getReplies());
         p.setAudience(dto.getAudience());
@@ -233,6 +229,10 @@ public class PostService {
 
     public List<Post> getAllPosts() {
         return postRepo.findAll();
+    }
+    
+    public List<Post> getAllFeedPosts(Integer userId) {
+        return null;
     }
 
     public Post getPostById(Integer id) {
