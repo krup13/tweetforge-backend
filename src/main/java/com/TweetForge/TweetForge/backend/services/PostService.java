@@ -15,8 +15,6 @@ import com.TweetForge.TweetForge.backend.exceptions.UnableToCreatePostException;
 import com.TweetForge.TweetForge.backend.models.ApplicationUser;
 import com.TweetForge.TweetForge.backend.models.Audience;
 import com.TweetForge.TweetForge.backend.models.Image;
-import com.TweetForge.TweetForge.backend.models.Poll;
-import com.TweetForge.TweetForge.backend.models.PollChoice;
 import com.TweetForge.TweetForge.backend.models.Post;
 import com.TweetForge.TweetForge.backend.models.ReplyRestriction;
 import com.TweetForge.TweetForge.backend.repositories.PostRepository;
@@ -34,16 +32,14 @@ import org.springframework.web.multipart.MultipartFile;
 public class PostService {
     private final PostRepository postRepo;
     private final ImageService imageService;
-    private final PollService pollService;
     private final TokenService tokenService;
     private final UserService userService;
 
     @Autowired
-    public PostService(PostRepository postRepo, ImageService imageService, PollService pollService,
+    public PostService(PostRepository postRepo, ImageService imageService,
                        TokenService tokenService, UserService userService) {
         this.postRepo = postRepo;
         this.imageService = imageService;
-        this.pollService = pollService;
         this.tokenService = tokenService;
         this.userService = userService;
     }
@@ -66,30 +62,6 @@ public class PostService {
             dto.setImages(gifList);
         }
 
-        // If true, there is a Poll that needs to be created
-        Poll savedPoll = null;
-        // System.out.println(dto);
-        if (dto.getPoll() != null) {
-            Poll p = new Poll();
-            p.setEndTime(dto.getPoll().getEndTime());
-            p.setChoices(new ArrayList<>());
-            savedPoll = pollService.generatePoll(p);
-            List<PollChoice> pollChoices = new ArrayList<PollChoice>();
-            List<PollChoice> choices = dto.getPoll().getChoices();
-            for (int i = 0; i < choices.size(); i++) {
-                PollChoice choice = choices.get(i);
-                choice.setPoll(savedPoll);
-                choice = pollService.generateChoice(choice);
-                pollChoices.add(choice);
-            }
-
-            savedPoll.setChoices(pollChoices);
-            savedPoll = pollService.generatePoll(savedPoll);
-
-            System.out.println(savedPoll);
-
-        }
-
         Post p = new Post();
         p.setContent(dto.getContent());
         if (dto.getScheduled()) {
@@ -100,12 +72,9 @@ public class PostService {
         }
         p.setAuthor(dto.getAuthor());
         p.setReplies(dto.getReplies());
-        p.setScheduled(dto.getScheduled());
-        p.setScheduledDate(dto.getScheduledDate());
         p.setAudience(dto.getAudience());
         p.setReplyRestriction(dto.getReplyRestriction());
         p.setImages(dto.getImages());
-        p.setPoll(savedPoll);
 
         try {
             Post posted = postRepo.save(p);
@@ -134,8 +103,6 @@ public class PostService {
             }
             p.setAuthor(dto.getAuthor());
             p.setReplies(dto.getReplies());
-            p.setScheduled(dto.getScheduled());
-            p.setScheduledDate(dto.getScheduledDate());
             p.setAudience(dto.getAudience());
             p.setReplyRestriction(dto.getReplyRestriction());
 
@@ -169,8 +136,7 @@ public class PostService {
                 dto.getScheduled(),
                 dto.getScheduledDate(),
                 Audience.EVERYONE,
-                ReplyRestriction.EVERYONE,
-                dto.getPoll());
+                ReplyRestriction.EVERYONE);
 
         Post reply = createPost(postDTO);
         reply.setReply(true);
@@ -200,8 +166,7 @@ public class PostService {
                     dto.getScheduled(),
                     dto.getScheduledDate(),
                     Audience.EVERYONE,
-                    ReplyRestriction.EVERYONE,
-                    dto.getPoll());
+                    ReplyRestriction.EVERYONE);
 
             Post replyPost = createPost(postDTO);
             replyPost.setReply(true);
@@ -262,40 +227,6 @@ public class PostService {
             likes.add(user);
         }
         post.setLikes(likes);
-
-        return postRepo.save(post);
-    }
-
-    public Post bookmark(Integer postId, String token) {
-        String username = tokenService.getUsernameFromToken(token);
-        ApplicationUser user = userService.getUserByUsername(username);
-
-        Post post = postRepo.findById(postId).orElseThrow(PostDoesNotExistException::new);
-
-        Set<ApplicationUser> bookmarks = post.getBookmarks();
-        if(bookmarks.contains(user)){
-            bookmarks = bookmarks.stream().filter(u -> u.getUserId() != user.getUserId()).collect(Collectors.toSet());
-        } else {
-            bookmarks.add(user);
-        }
-        post.setBookmarks(bookmarks);
-
-        return postRepo.save(post);
-    }
-
-    public Post viewPost(Integer postId, String token){
-        String username = tokenService.getUsernameFromToken(token);
-        ApplicationUser user = userService.getUserByUsername(username);
-
-        Post post = postRepo.findById(postId).orElseThrow(PostDoesNotExistException::new);
-
-        Set<ApplicationUser> views = post.getViews();
-
-        if(views.contains(user)) return post;
-
-        views.add(user);
-
-        post.setViews(views);
 
         return postRepo.save(post);
     }

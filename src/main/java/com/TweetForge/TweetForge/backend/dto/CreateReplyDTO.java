@@ -2,11 +2,8 @@ package com.TweetForge.TweetForge.backend.dto;
 
 import com.TweetForge.TweetForge.backend.models.ApplicationUser;
 import com.TweetForge.TweetForge.backend.models.Image;
-import com.TweetForge.TweetForge.backend.models.Poll;
-import com.TweetForge.TweetForge.backend.models.Post;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 public class CreateReplyDTO {
@@ -16,19 +13,17 @@ public class CreateReplyDTO {
     private List<Image> images;
     private Boolean scheduled;
     private LocalDateTime scheduledDate;
-    private Poll poll;
 
     public CreateReplyDTO() {
     }
 
-    public CreateReplyDTO(ApplicationUser author, Integer originalPost, String replyContent, List<Image> images, Boolean scheduled, LocalDateTime scheduledDate, Poll poll) {
+    public CreateReplyDTO(ApplicationUser author, Integer originalPost, String replyContent, List<Image> images, Boolean scheduled, LocalDateTime scheduledDate) {
         this.author = author;
         this.originalPost = originalPost;
         this.replyContent = replyContent;
         this.images = images;
         this.scheduled = scheduled;
         this.scheduledDate = scheduledDate;
-        this.poll = poll;
     }
 
     public Integer getOriginalPost() {
@@ -61,14 +56,6 @@ public class CreateReplyDTO {
 
     public void setScheduledDate(LocalDateTime scheduledDate) {
         this.scheduledDate = scheduledDate;
-    }
-
-    public Poll getPoll() {
-        return poll;
-    }
-
-    public void setPoll(Poll poll) {
-        this.poll = poll;
     }
 
     public ApplicationUser getAuthor() {

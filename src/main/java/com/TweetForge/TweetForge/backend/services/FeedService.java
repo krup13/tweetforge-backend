@@ -27,13 +27,11 @@ public class FeedService {
     public FetchFeedResponseDTO getFeedForUser(Integer id, LocalDateTime sessionStart, Integer page){
 
         ApplicationUser currentUser = userService.getUserById(id);
-        System.out.println(currentUser == null);
 
         Set<ApplicationUser> following = currentUser.getFollowing();
         following.add(currentUser);
         
         List<Post> allPosts = postService.getAllPosts();
-        System.out.println("Posts size : " + allPosts.size());
         List<FeedPostDTO> feedPostDTOs = new ArrayList<>();
         
         for(int i = 0; i < allPosts.size(); i++) {

@@ -28,16 +28,23 @@ public class Post implements Comparable<Post>{
     @Column(name="posted_date")
     private LocalDateTime postedDate;
 
+    // Denote whether the post HAS A REPLY
     @Column(name="is_reply", nullable=false)
     private Boolean reply=true;
 
+    // If reply is true, this field denote the post_id of the replying post
     @Column(name="reply_to")
     private Integer replyTo;
 
     @ManyToOne
     @JoinColumn(name="author_id", nullable=false)
     private ApplicationUser author;
-
+    
+    /**
+     * From the post_likes_junction table, obtain all rows where post_id equals
+     * this.post_id and from those rows, fetch all users defined in user_id columns
+     * using FetchType.LAZY strategy.
+     */
     @ManyToMany(fetch=FetchType.LAZY)
     @JoinTable(
             name="post_likes_junction",
@@ -51,6 +58,7 @@ public class Post implements Comparable<Post>{
 
     //TODO: Figure out video upload
 
+    
     @ManyToMany(fetch=FetchType.LAZY)
     @JoinTable(
             name="post_reply_junction",
@@ -67,28 +75,6 @@ public class Post implements Comparable<Post>{
     )
     private Set<ApplicationUser> reposts;
 
-    @ManyToMany(fetch=FetchType.LAZY)
-    @JoinTable(
-            name="post_bookmark_junction",
-            joinColumns= {@JoinColumn(name="post_id")},
-            inverseJoinColumns = {@JoinColumn(name="user_id")}
-    )
-    private Set<ApplicationUser> bookmarks;
-
-    @ManyToMany(fetch=FetchType.LAZY)
-    @JoinTable(
-            name="post_view_junction",
-            joinColumns= {@JoinColumn(name="post_id")},
-            inverseJoinColumns = {@JoinColumn(name="user_id")}
-    )
-    private Set<ApplicationUser> views;
-
-    @Column(name="scheduled", nullable=false)
-    private Boolean scheduled=false;
-
-    @Column(name="scheduled_date", nullable=true)
-    private LocalDateTime scheduledDate;
-
     @Enumerated(EnumType.ORDINAL)
     private Audience audience;
 
@@ -96,21 +82,15 @@ public class Post implements Comparable<Post>{
     @Column(name="reply_restriction")
     private ReplyRestriction replyRestriction;
 
-    @OneToOne(cascade=CascadeType.ALL)
-    @JoinColumn(name="poll_id", referencedColumnName="poll_id", nullable = true)
-    private Poll poll;
-
     public Post() {
         super();
         this.likes = new HashSet<>();
         this.images = new ArrayList<>();
         this.replies = new HashSet<>();
         this.reposts = new HashSet<>();
-        this.bookmarks = new HashSet<>();
-        this.views = new HashSet<>();
     }
 
-    public Post(Integer postId, String content, LocalDateTime postedDate, Boolean reply, Integer replyTo, ApplicationUser author, Set<ApplicationUser> likes, List<Image> images, Set<Post> replies, Set<ApplicationUser> reposts, Set<ApplicationUser> bookmarks, Set<ApplicationUser> views, Boolean scheduled, LocalDateTime scheduledDate, Audience audience, ReplyRestriction replyRestriction, Poll poll) {
+    public Post(Integer postId, String content, LocalDateTime postedDate, Boolean reply, Integer replyTo, ApplicationUser author, Set<ApplicationUser> likes, List<Image> images, Set<Post> replies, Set<ApplicationUser> reposts, Set<ApplicationUser> bookmarks, Set<ApplicationUser> views, Boolean scheduled, LocalDateTime scheduledDate, Audience audience, ReplyRestriction replyRestriction) {
         this.postId = postId;
         this.content = content;
         this.postedDate = postedDate;
@@ -121,13 +101,8 @@ public class Post implements Comparable<Post>{
         this.images = images;
         this.replies = replies;
         this.reposts = reposts;
-        this.bookmarks = bookmarks;
-        this.views = views;
-        this.scheduled = scheduled;
-        this.scheduledDate = scheduledDate;
         this.audience = audience;
         this.replyRestriction = replyRestriction;
-        this.poll = poll;
     }
 
     public Integer getPost() {
@@ -194,38 +169,6 @@ public class Post implements Comparable<Post>{
         this.reposts = reposts;
     }
 
-    public Set<ApplicationUser> getBookmarks() {
-        return bookmarks;
-    }
-
-    public void setBookmarks(Set<ApplicationUser> bookmarks) {
-        this.bookmarks = bookmarks;
-    }
-
-    public Set<ApplicationUser> getViews() {
-        return views;
-    }
-
-    public void setViews(Set<ApplicationUser> views) {
-        this.views = views;
-    }
-
-    public Boolean getScheduled() {
-        return scheduled;
-    }
-
-    public void setScheduled(Boolean scheduled) {
-        this.scheduled = scheduled;
-    }
-
-    public LocalDateTime getScheduledDate() {
-        return scheduledDate;
-    }
-
-    public void setScheduledDate(LocalDateTime scheduledDate) {
-        this.scheduledDate = scheduledDate;
-    }
-
     public Audience getAudience() {
         return audience;
     }
@@ -240,14 +183,6 @@ public class Post implements Comparable<Post>{
 
     public void setReplyRestriction(ReplyRestriction replyRestriction) {
         this.replyRestriction = replyRestriction;
-    }
-
-    public Poll getPoll() {
-        return poll;
-    }
-
-    public void setPoll(Poll poll) {
-        this.poll = poll;
     }
 
     public Boolean getReply() {
@@ -290,13 +225,8 @@ public class Post implements Comparable<Post>{
                 ", images=" + images +
                 ", replies=" + replies +
                 ", reposts=" + reposts +
-                ", bookmarks=" + bookmarks +
-                ", views=" + views +
-                ", scheduled=" + scheduled +
-                ", scheduledDate=" + scheduledDate +
                 ", audience=" + audience +
                 ", replyRestriction=" + replyRestriction +
-                ", poll=" + poll +
                 '}';
     }
 

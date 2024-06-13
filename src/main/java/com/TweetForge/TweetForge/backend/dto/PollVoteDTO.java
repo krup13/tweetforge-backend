@@ -1,8 +1,5 @@
 package com.TweetForge.TweetForge.backend.dto;
 
-import com.TweetForge.TweetForge.backend.models.ApplicationUser;
-import com.TweetForge.TweetForge.backend.models.PollChoice;
-
 public class PollVoteDTO {
 
     private Integer choiceId;

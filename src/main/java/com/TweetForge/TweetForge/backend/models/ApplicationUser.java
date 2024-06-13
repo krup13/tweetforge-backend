@@ -59,7 +59,7 @@ public class ApplicationUser {
     @JoinColumn(name="organization_id", nullable = true)
     private Image organization;
 
-    @ManyToMany(fetch=FetchType.EAGER)
+    @ManyToMany(fetch=FetchType.LAZY)
     @JoinTable(
             name="following",
             joinColumns= {@JoinColumn(name="user_id")},
@@ -68,7 +68,7 @@ public class ApplicationUser {
     @JsonIgnore
     private Set<ApplicationUser> following;
 
-    @ManyToMany(fetch=FetchType.EAGER)
+    @ManyToMany(fetch=FetchType.LAZY)
     @JoinTable(
             name="followers",
             joinColumns= {@JoinColumn(name="user_id")},
@@ -79,7 +79,7 @@ public class ApplicationUser {
 
     /* Security related */
 
-    @ManyToMany(fetch=FetchType.EAGER)
+    @ManyToMany(fetch=FetchType.LAZY)
     @JoinTable(
             name="user_role_junction",
             joinColumns = {@JoinColumn(name="user_id")},

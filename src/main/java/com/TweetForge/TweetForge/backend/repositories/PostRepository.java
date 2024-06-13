@@ -17,12 +17,11 @@ import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;
 
 public interface PostRepository extends JpaRepository<Post, Integer>{
-
+    
     String FEED_QUERY = "select * from\n" +
-            "\t(select * from posts where author_id = :id\n" +
+            "\t(select post_id, content, posted_date, is_reply, reply_to, author_id from posts where author_id = :id\n" +
             "\tunion\n" +
-            "\tselect p.post_id, p.audience, p.content, p.posted_date, p.is_reply, p.reply_restriction, p.reply_to, p.scheduled,\n" +
-            "\t\tp.scheduled_date, p.author_id, p.poll_id\n" +
+            "\tselect p.post_id, p.content, p.posted_date, p.is_reply, p.reply_to, p.author_id\n" +
             "\tfrom posts p\n" +
             "\tinner join post_repost_junction prj\n" +
             "\ton p.post_id = prj.post_id where prj.user_id\n" +
@@ -31,8 +30,7 @@ public interface PostRepository extends JpaRepository<Post, Integer>{
             "\t\tinner join following\n" +
             "\t\ton u.user_id = following.following_id where following.user_id = :id and not following.following_id = :id)\n" +
             "\tunion\n" +
-            "\tselect p.post_id, p.audience, p.content, p.posted_date, p.is_reply, p.reply_restriction, p.reply_to, p.scheduled,\n" +
-            "\t\tp.scheduled_date, p.author_id, p.poll_id\n" +
+            "\tselect p.post_id, p.content, p.posted_date, p.is_reply, p.reply_to, p.author_id\n" +
             "\tfrom posts p\n" +
             "\twhere p.author_id in (select u.user_id as following_id\n" +
             "\t\t\tfrom users u\n" +

@@ -90,16 +90,6 @@ public class PostController {
         return postService.like(id, token);
     }
 
-    @PutMapping("/bookmark/{id}")
-    public Post bookmark(@PathVariable("id") int id, @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        return postService.bookmark(id, token);
-    }
-
-    @PutMapping("/view/{id}")
-    public Post view(@PathVariable("id") int id, @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        return postService.viewPost(id, token);
-    }
-
     @DeleteMapping("/")
     public ResponseEntity<String> deletePost(@RequestBody Post p){
         postService.deletePost(p);

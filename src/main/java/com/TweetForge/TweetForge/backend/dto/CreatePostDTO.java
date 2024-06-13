@@ -1,14 +1,12 @@
 package com.TweetForge.TweetForge.backend.dto;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
 import com.TweetForge.TweetForge.backend.models.ApplicationUser;
 import com.TweetForge.TweetForge.backend.models.Audience;
 import com.TweetForge.TweetForge.backend.models.Image;
-import com.TweetForge.TweetForge.backend.models.Poll;
 import com.TweetForge.TweetForge.backend.models.Post;
 import com.TweetForge.TweetForge.backend.models.ReplyRestriction;
 
@@ -22,14 +20,13 @@ public class CreatePostDTO {
     private LocalDateTime scheduledDate;
     private Audience audience;
     private ReplyRestriction replyRestriction;
-    private Poll poll;
 
     public CreatePostDTO() {
         super();
     }
 
     public CreatePostDTO(String content, ApplicationUser author, Set<Post> replies, List<Image> images, Boolean scheduled,
-                         LocalDateTime scheduledDate, Audience audience, ReplyRestriction replyRestriction, Poll poll) {
+                         LocalDateTime scheduledDate, Audience audience, ReplyRestriction replyRestriction) {
         super();
         this.content = content;
         this.author = author;
@@ -39,7 +36,6 @@ public class CreatePostDTO {
         this.scheduledDate = scheduledDate;
         this.audience = audience;
         this.replyRestriction = replyRestriction;
-        this.poll = poll;
     }
 
     public String getContent() {
@@ -107,21 +103,11 @@ public class CreatePostDTO {
         this.replyRestriction = replyRestriction;
     }
 
-
-
-    public Poll getPoll() {
-        return poll;
-    }
-
-    public void setPoll(Poll poll) {
-        this.poll = poll;
-    }
-
     @Override
     public String toString() {
         return "CreatePostDTO [content=" + content + ", author=" + author + ", replies=" + replies + ", images="
                 + images + ", scheduled=" + scheduled + ", scheduledDate=" + scheduledDate + ", audience=" + audience
-                + ", replyRestriction=" + replyRestriction + ", poll=" + poll + "]";
+                + ", replyRestriction=" + replyRestriction + "]";
     }
 
 
