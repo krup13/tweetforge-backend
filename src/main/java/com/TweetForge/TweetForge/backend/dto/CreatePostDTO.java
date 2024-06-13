@@ -18,8 +18,8 @@ public class CreatePostDTO {
     private List<Image> images;
     private Boolean scheduled;
     private LocalDateTime scheduledDate;
-    private Audience audience;
-    private ReplyRestriction replyRestriction;
+    private Audience audience = Audience.EVERYONE;
+    private ReplyRestriction replyRestriction = ReplyRestriction.EVERYONE;
 
     public CreatePostDTO() {
         super();

@@ -1,17 +1,12 @@
 package com.TweetForge.TweetForge.backend.models;
 
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import jakarta.persistence.*;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.springframework.data.domain.Page;
 
 @Entity
 @Table(name="posts")
@@ -30,7 +25,7 @@ public class Post implements Comparable<Post>{
 
     // Denote whether the post HAS A REPLY
     @Column(name="is_reply", nullable=false)
-    private Boolean reply=true;
+    private Boolean reply=false;
 
     // If reply is true, this field denote the post_id of the replying post
     @Column(name="reply_to")
@@ -76,11 +71,11 @@ public class Post implements Comparable<Post>{
     private Set<ApplicationUser> reposts;
 
     @Enumerated(EnumType.ORDINAL)
-    private Audience audience;
+    private Audience audience = Audience.EVERYONE;
 
     @Enumerated(EnumType.ORDINAL)
     @Column(name="reply_restriction")
-    private ReplyRestriction replyRestriction;
+    private ReplyRestriction replyRestriction = ReplyRestriction.EVERYONE;
 
     public Post() {
         super();
