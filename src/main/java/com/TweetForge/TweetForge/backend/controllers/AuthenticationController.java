@@ -24,6 +24,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
 import java.util.LinkedHashMap;
 
 @RestController
@@ -150,7 +151,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/password/code")
-    public ResponseEntity<String> retrievePasswordCode(@RequestBody PasswordCodeDTO body) throws EmailFailedToSendException {
+    public ResponseEntity<String> retrievePasswordCode(@RequestBody PasswordCodeDTO body) throws EmailFailedToSendException, MessagingException {
         String email = body.getEmail();
         int code = body.getCode();
         emailService.sendEmail(email, "Your password reset code", ""+code);
