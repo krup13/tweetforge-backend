@@ -45,7 +45,11 @@ public class DiscoveryService {
     }
 
     public Set<Post> searchForPosts(String searchTerm){
-        return postRepository.searchForPosts(searchTerm);
+        if (searchTerm.startsWith("#")) {
+            return postRepository.searchForPostsWithHashtag(searchTerm);
+        } else {
+            return postRepository.searchForPostsWithTerm(searchTerm);
+        }
     }
 
 }

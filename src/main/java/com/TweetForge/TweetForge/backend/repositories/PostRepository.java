@@ -37,6 +37,26 @@ public interface PostRepository extends JpaRepository<Post, Integer>{
             "\t\t\tinner join following\n" +
             "\t\t\ton u.user_id = following.following_id where following.user_id = :id and not following.following_id = :id)\n" +
             "\t\t\t) as p where p.posted_date <= :session_start order by p.posted_date desc";
+    
+    String FEED_QUERY_1 = "select * from\n" +
+            "\t(select post_id, audience, content, posted_date, is_reply, reply_restriction, reply_to, author_id from posts where author_id != :id\n" +
+            "\tunion\n" +
+            "\tselect p.post_id, p.audience, p.content, p.posted_date, p.is_reply, p.reply_restriction, p.reply_to, p.author_id\n" +
+            "\tfrom posts p\n" +
+            "\tinner join post_repost_junction prj\n" +
+            "\ton p.post_id = prj.post_id where prj.user_id\n" +
+            "\tin (select u.user_id as following_id\n" +
+            "\t\tfrom users u\n" +
+            "\t\tinner join following\n" +
+            "\t\ton u.user_id = following.following_id where following.user_id = :id and not following.following_id = :id)\n" +
+            "\tunion\n" +
+            "\tselect p.post_id, p.audience, p.content, p.posted_date, p.is_reply, p.reply_restriction, p.reply_to, p.author_id\n" +
+            "\tfrom posts p\n" +
+            "\twhere p.author_id in (select u.user_id as following_id\n" +
+            "\t\t\tfrom users u\n" +
+            "\t\t\tinner join following\n" +
+            "\t\t\ton u.user_id = following.following_id where following.user_id = :id and not following.following_id = :id)\n" +
+            "\t\t\t) as p where p.posted_date <= :session_start order by p.posted_date desc";
 
     Optional<Set<Post>> findByAuthor(ApplicationUser author);
 
@@ -44,7 +64,15 @@ public interface PostRepository extends JpaRepository<Post, Integer>{
             countQuery = "select count(*) from (" + FEED_QUERY + ")"
     )
     public Page<Post> findFeedPosts(@Param("id") Integer id, @Param("session_start") LocalDateTime sessionDate, Pageable pageable);
-
+    
+    @Query(nativeQuery = true, value = FEED_QUERY_1,
+            countQuery = "select count(*) from (" + FEED_QUERY_1 + ")"
+    )
+    public List<Post> findFeedPostsNotByUserId(@Param("id") Integer userId, @Param("session_start") LocalDateTime sessionDate);
+    
     @Query("SELECT p FROM Post p WHERE p.content LIKE %:searchTerm%")
-    Set<Post> searchForPosts(@Param("searchTerm") String searchTerm);
+    Set<Post> searchForPostsWithTerm(@Param("searchTerm") String searchTerm);
+    
+    @Query("SELECT p FROM Post p WHERE p.content LIKE CONCAT('%#', :searchHashtag, '%#%') OR p.content LIKE CONCAT('%#', :searchHashtag, ' %')")
+    Set<Post> searchForPostsWithHashtag(@Param("searchHashtag") String searchHashtag);
 }

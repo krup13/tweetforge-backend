@@ -232,7 +232,7 @@ public class PostService {
     }
     
     public List<Post> getAllFeedPosts(Integer userId) {
-        return null;
+        return postRepo.findFeedPostsNotByUserId(userId, LocalDateTime.now());
     }
 
     public Post getPostById(Integer id) {

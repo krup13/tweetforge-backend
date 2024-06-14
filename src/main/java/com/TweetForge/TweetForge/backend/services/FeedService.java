@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -24,14 +25,20 @@ public class FeedService {
         this.postService = postService;
     }
 
-    public FetchFeedResponseDTO getFeedForUser(Integer id, LocalDateTime sessionStart, Integer page){
+    public FetchFeedResponseDTO getFeedForUser(Integer id, LocalDateTime sessionStart, Integer page, Optional<String> searchTerm){
+        List<Post> allPosts = new ArrayList<>();
 
         ApplicationUser currentUser = userService.getUserById(id);
 
         Set<ApplicationUser> following = currentUser.getFollowing();
         following.add(currentUser);
         
-        List<Post> allPosts = postService.getAllPosts();
+        if (searchTerm.isEmpty()) {
+            allPosts.addAll(postService.getAllPosts());
+        }
+        else {
+            allPosts.addAll(postService.getAllFeedPosts(id));
+        }
         List<FeedPostDTO> feedPostDTOs = new ArrayList<>();
         
         for(int i = 0; i < allPosts.size(); i++) {

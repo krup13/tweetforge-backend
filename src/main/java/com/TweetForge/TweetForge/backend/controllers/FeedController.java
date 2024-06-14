@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/feed")
@@ -26,7 +27,15 @@ public class FeedController {
     @PostMapping
     public FetchFeedResponseDTO getPostsForFeed(@RequestBody FeedRequestDTO feedRequest){
         System.out.println(feedRequest);
-        return feedService.getFeedForUser(feedRequest.getUserId(), feedRequest.getSessionStart(), feedRequest.getPage());
+        return feedService.getFeedForUser(feedRequest.getUserId(), feedRequest.getSessionStart(), feedRequest.getPage(), Optional.empty());
+    }
+    
+    @PostMapping("/searched")
+    public FetchFeedResponseDTO getSearchedPostsForFeed(
+            @RequestBody FeedRequestDTO feedRequest,
+            @RequestParam(value = "searchTerm") String searchTerm) {
+        System.out.println(feedRequest);
+        return feedService.getFeedForUser(feedRequest.getUserId(), feedRequest.getSessionStart(), feedRequest.getPage(), Optional.of(searchTerm));
     }
 
 }
